@@ -358,21 +358,27 @@
 
                 </div>
                 <div class="right-container">
-                    <form action="" method="post">
-                        <div class="update-status">
-                            <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
-                                  method="post">
-                                <h3>Cập nhập trạng thái</h3>
-                                <input type="hidden" name="idBill" value="${idBill}">
-                                <select class="option-status" name="selectedStatus">
-                                    <option>Đang xử lý</option>
-                                    <option>Đang giao</option>
-                                    <option>Đã giao</option>
-                                    <option>Đã hủy</option>
-                                </select>
+                    <div>
+                        <div class="order-verification">
+                            <!-- Nút kiểm tra chữ ký -->
+                            <button id="check-signature-btn" onclick="checkSignature(${idBill})">
+                                Kiểm tra tính hợp lệ
+                            </button>
+                            <div id="update-status-form" style="display: none;">
+                                <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
+                                      method="post">
+                                    <h3>Cập nhập trạng thái</h3>
+                                    <input type="hidden" name="idBill" value="${idBill}">
+                                    <select class="option-status" name="selectedStatus">
+                                        <option>Đang xử lý</option>
+                                        <option>Đang giao</option>
+                                        <option>Đã giao</option>
+                                        <option>Đã hủy</option>
+                                    </select>
 
-                                <button type="submit">Cập nhập trạng thái</button>
-                            </form>
+                                    <button type="submit">Cập nhập trạng thái</button>
+                                </form>
+                            </div>
                         </div>
                         <div class="table-wrapper">
                             <table class="table-sanpham">
@@ -455,10 +461,10 @@
                                 <div class="grid-item total-money"></div>
                             </div>
                         </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
     </section>
     <!-- Button to Open the Modal -->
     <button id="openModalBtn">Open Modal</button>
