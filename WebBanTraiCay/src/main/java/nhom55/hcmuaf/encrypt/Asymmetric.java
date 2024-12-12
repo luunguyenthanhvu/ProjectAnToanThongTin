@@ -28,6 +28,7 @@ public interface Asymmetric {
     String getPublicKeyAsString();
     void loadPrivateKeyAsString(String privateKeyAsString) throws NoSuchAlgorithmException, InvalidKeySpecException;
     void loadPublicKeyAsString(String publicKeyAsString) throws NoSuchAlgorithmException, InvalidKeySpecException;
+    void loadKeyPair(KeyPair keyPair);
     File writePrivateKeyToFile(String filePath) throws IOException;
     File writePublicKeyToFile(String filePath) throws IOException;
     KeyPair getKeyPair();

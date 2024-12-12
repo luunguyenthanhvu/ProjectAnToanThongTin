@@ -71,6 +71,12 @@ public class AsymmetricImpl implements Asymmetric {
     }
 
     @Override
+    public void loadKeyPair(KeyPair keyPair) {
+        this.privateKey = keyPair.getPrivate();
+        this.publicKey = keyPair.getPublic();
+    }
+
+    @Override
     public File writePrivateKeyToFile(String filePath) throws IOException {
         if (publicKey == null) {
             throw new IllegalStateException("Private key is not initialized");
