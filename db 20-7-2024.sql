@@ -43,6 +43,8 @@ CREATE TABLE `bills` (
   `totalPrice` float DEFAULT NULL,
   `deliveryFee` float DEFAULT NULL,
   `note` text DEFAULT NULL,
+`signature` text DEFAULT NULL,
+`isVerify`  int(11) DEFAULT NULL,
   `creationTime` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -808,6 +810,20 @@ INSERT INTO `voucher` (`id`, `idUser`, `title`, `content`, `beginDate`, `endDate
 (1, 5, 'GIẢM 30K', 'Người dùng thanh toán lần đầu sẽ được giảm 30k cho 1 đơn hàng', '2024-07-19', '2024-08-18', 300000),
 (2, 5, 'GIẢM 20%', 'Đơn thanh toán trên 200k sẽ được giảm 20%', '2024-07-19', '2024-08-18', 0.2);
 
+-- Tao bang public key
+CREATE TABLE `public_key` (
+  `id` int(11) NOT NULL,
+  `key` text DEFAULT NULL,
+  `createDate` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Tao bang userPublicKey
+CREATE TABLE `user_public_key` (
+  `id` int(11) NOT NULL,
+  `idUser` int(11) NOT NULL,
+`idPublicKey` int(11) NOT NULL,
+`status` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 --
 -- Chỉ mục cho các bảng đã đổ
 --
@@ -819,7 +835,13 @@ ALTER TABLE `bills`
   ADD PRIMARY KEY (`id`),
   ADD KEY `userId` (`userId`),
   ADD KEY `payment` (`payment`);
-
+--
+ALTER TABLE `public_key` 
+  ADD PRIMARY KEY (`id`);
+ALTER TABLE `user_public_key`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idUser` (`idUser`),
+  ADD KEY `idPublicKey` (`idPublicKey`);
 --
 -- Chỉ mục cho bảng `bill_details`
 --
@@ -943,6 +965,13 @@ ALTER TABLE `bill_details`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+-- Auto increment cho bang publickey
+
+ALTER TABLE `user_public_key`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `public_key`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1081,6 +1110,9 @@ ALTER TABLE `shipment_transactions`
   ADD CONSTRAINT `fk_shipmentCreatedById` FOREIGN KEY (`createdBy`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `fk_shipmentDetailId` FOREIGN KEY (`shipmentDetailId`) REFERENCES `shipment_details` (`id`);
 
+ALTER TABLE `user_public_key`
+  ADD CONSTRAINT `user_public_key_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `user_public_key_ibfk_2` FOREIGN KEY (`idPublicKey`) REFERENCES `public_key` (`id`);
 --
 -- Các ràng buộc cho bảng `users`
 --
