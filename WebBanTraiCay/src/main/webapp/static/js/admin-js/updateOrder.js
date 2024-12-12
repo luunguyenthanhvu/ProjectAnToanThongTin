@@ -1,23 +1,20 @@
 'use strict';
 
-var cloudName = 'dter3mlpl';
-var apiKey = '899244476586798';
-var cl = cloudinary.Cloudinary.new({cloud_name: cloudName});
+const cloudName = 'dter3mlpl';
+const apiKey = '899244476586798';
+const cl = cloudinary.Cloudinary.new({cloud_name: cloudName});
 
+// Cập nhật ảnh sản phẩm
 $('.table-wrapper .table-sanpham .img-product img').each((_, elements) => {
   const publicId = $(elements).data('assets');
   const imgUrl = cl.url(publicId);
   const imgDefault = `${window.context}/static/images/default-fruit.jpg`;
-  // check if image is exits
-  if (imgUrl !== null) {
-    $(elements).prop('src', imgUrl);
-  } else {
-    $(elements).prop('src', imgDefault);
-  }
-})
 
+  $(elements).prop('src', imgUrl || imgDefault);
+});
+
+// Hàm lấy thông tin lô hàng
 function getShipmentDetails(productId) {
-  // Hiển thị SweetAlert2 modal trước khi thực hiện AJAX request
   Swal.fire({
     title: 'Loading...',
     text: 'Fetching shipment details...',
@@ -25,98 +22,119 @@ function getShipmentDetails(productId) {
     didOpen: () => {
       Swal.showLoading();
 
-      fetch(`${window.context}/api/order-details/${productId}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log(data); // Kiểm tra dữ liệu nhận được
+      $.ajax({
+        url: `${window.context}/api/order-details/${productId}`,
+        method: 'GET',
+        success: function (data) {
+          if (Array.isArray(data) && data.length > 0) {
+            let itemsHtml = '';
+            data.forEach(item => {
+              const dateIn = new Date(
+                  item.dateIn.year,
+                  item.dateIn.monthValue - 1,
+                  item.dateIn.dayOfMonth,
+                  item.dateIn.hour,
+                  item.dateIn.minute,
+                  item.dateIn.second
+              );
+              const formattedDateIn = dateIn.toLocaleDateString() + ' '
+                  + dateIn.toLocaleTimeString();
 
-        // Kiểm tra dữ liệu trước khi sử dụng
-        if (Array.isArray(data) && data.length > 0) {
-          // Xây dựng nội dung modal từ danh sách các mục
-          let itemsHtml = '';
-          data.forEach(item => {
-            const dateIn = new Date(item.dateIn.year,
-                item.dateIn.monthValue - 1, item.dateIn.dayOfMonth,
-                item.dateIn.hour, item.dateIn.minute, item.dateIn.second);
-            const formattedDateIn = dateIn.toLocaleDateString() + ' '
-                + dateIn.toLocaleTimeString();
-            itemsHtml += `
-                   <div class="item cart-item flex">
-                    <input style="cursor: pointer; width: 30px; height: 30px" type="checkbox" id="${item.id}" value="${item.id}">
-                    <img style="width: 60px; height: 60px" src="${window.context}/static/images/accountPicture.png"
-                                     alt="profileImg">
-                     <div>      
-                     <p>Ten san pham:</p>
-                     <span>${item.productName}</span>
-                     </div>
-                     <div>
-                     <p>Ngay nhap</p>
-                     <span>${formattedDateIn}</span>
-                     </div>
-                     <div>
-                     <div>
-                    <span>So luong</span>
+              itemsHtml += `
+                <div class="item cart-item flex">
+                  <input style="cursor: pointer; width: 30px; height: 30px" type="checkbox" id="${item.id}" value="${item.id}">
+                  <img style="width: 60px; height: 60px" src="${window.context}/static/images/accountPicture.png" alt="profileImg">
+                  <div>
+                    <p>Tên sản phẩm:</p>
+                    <span>${item.productName}</span>
+                  </div>
+                  <div>
+                    <p>Ngày nhập:</p>
+                    <span>${formattedDateIn}</span>
+                  </div>
+                  <div>
+                    <span>Số lượng:</span>
                     <input type="number" min="1" style="width: 60px;">
-                    <span>Ton kho</span>
+                    <span>Tồn kho:</span>
                     <span>${item.quantity}</span>
                   </div>
-                      </div>
-                     
-                      
-                    </div>
-              `;
-          });
+                </div>`;
+            });
 
-          Swal.fire({
-            title: 'Chọn lô hàng',
-            html:
-                `
-            <div class="custom-swal-content" style="padding: 20px;">
-                ${itemsHtml}
-            </div>
-            `
-            ,
-            confirmButtonText: 'OK',
-          });
-        } else {
+            Swal.fire({
+              title: 'Chọn lô hàng',
+              html: `<div class="custom-swal-content" style="padding: 20px;">${itemsHtml}</div>`,
+              confirmButtonText: 'OK'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No shipment details found.'
+            });
+          }
+        },
+        error: function () {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No shipment details found.',
+            text: 'Failed to fetch shipment details.'
           });
         }
-      })
-      .catch(error => {
-        console.error('There was a problem with the fetch operation:', error); // Ghi lỗi
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to fetch shipment details.',
-        });
       });
     }
   });
 }
 
-$('.btn-get-product').on('click', function () {
+// Kiểm tra tính hợp lệ chữ ký
+function checkSignature(idBill) {
+  // Hiển thị SweetAlert với loading
   Swal.fire({
-    title: 'Custom Modal',
-    html:
-        `
-            <div style="padding: 20px;">
-            <h2>Modal Header</h2>
-            <p>This is a simple custom modal with SweetAlert2.</p>
-            </div>
-            `
-    ,
-    confirmButtonText: 'OK',
-    customClass: {
-      container: 'custom-swal-container'
+    title: 'Kiểm tra tính hợp lệ',
+    text: 'Hệ thống đang kiểm tra chữ ký...',
+    allowOutsideClick: false, // Không cho phép click ra ngoài
+    didOpen: () => {
+      Swal.showLoading(); // Bắt đầu hiển thị loading
     }
   });
-})
+
+  // Gửi AJAX request sau 2 giây
+  setTimeout(() => {
+    $.ajax({
+      url: `${window.context}/api/order-details/check-signature`,
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({idBill}),
+      success: function (response) {
+        console.log(response)
+        Swal.close(); // Đóng loading sau khi nhận phản hồi
+        // Kiểm tra phản hồi từ server
+        if (response.message === "Verify success!") {
+          Swal.fire({
+            icon: 'success',
+            title: 'Cập nhật trạng thái thành công!',
+            text: 'Bạn có thể cập nhật trạng thái đơn hàng.'
+          }).then(() => {
+            $('#update-status-form').show();
+            $('#check-signature-btn').hide();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Cập nhật thất bại',
+            text: 'Không thể cập nhật trạng thái. Vui lòng thử lại.'
+          });
+        }
+      },
+      error: function () {
+        Swal.close(); // Đóng loading nếu xảy ra lỗi
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi hệ thống',
+          text: 'Không thể kiểm tra chữ ký. Vui lòng thử lại.'
+        });
+      }
+    });
+  }, 2000); // Đợi 2 giây trước khi gửi request
+}
+
