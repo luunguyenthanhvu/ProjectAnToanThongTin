@@ -26,6 +26,23 @@ public class Bills extends Log<Users> implements Serializable, IModel {
 
   private LocalDateTime creationTime;
   private boolean isVerify;
+
+  public boolean isVerify() {
+    return isVerify;
+  }
+
+  public void setVerify(boolean verify) {
+    isVerify = verify;
+  }
+
+  public String getSignature() {
+    return signature;
+  }
+
+  public void setSignature(String signature) {
+    this.signature = signature;
+  }
+
   private String signature;
 
 
