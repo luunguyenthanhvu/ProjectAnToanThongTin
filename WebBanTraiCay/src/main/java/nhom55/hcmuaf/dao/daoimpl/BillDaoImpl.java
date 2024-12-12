@@ -19,16 +19,16 @@ public class BillDaoImpl implements BillDao {
       String streetAddress, String city, String phoneNumber, String email, double totalPrice,
       double deliveryFee, String note) {
 
-    int count = JDBIConnector.get().withHandle(h -> {
-      return h.createQuery(
-              "SELECT count(*) FROM bills WHERE productList = :productList and orderedDate = :orderedDate")
-          .bind("productList", productList)
-          .bind("orderedDate", orderedDate)
-          .mapTo(int.class) // Sửa đổi ở đây
-          .one();
-    });
+//    int count = JDBIConnector.get().withHandle(h -> {
+//      return h.createQuery(
+//              "SELECT count(*) FROM bills WHERE productList = :productList and orderedDate = :orderedDate")
+//          .bind("productList", productList)
+//          .bind("orderedDate", orderedDate)
+//          .mapTo(int.class) // Sửa đổi ở đây
+//          .one();
+//    });
 
-    if (count > 0) {
+    if (false) {
       return false;
     } else {
       JDBIConnector.get().withHandle(h -> {
@@ -63,7 +63,7 @@ public class BillDaoImpl implements BillDao {
   @Override
   public int getIDAListProductFromBills(LocalDateTime orderedDate, int idUser) {
     int result = 0;
-    result = JDBIConnector.get().withHandle(handle -> {
+   result = JDBIConnector.get().withHandle(handle -> {
       return handle.createQuery(
               "SELECT id from bills where orderedDate = :orderedDate and userId = :idUser ")
           .bind("orderedDate", orderedDate)

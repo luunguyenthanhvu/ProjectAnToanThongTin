@@ -95,7 +95,7 @@ public class CheckOut extends HttpServlet {
           for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
             if (billDao.addAProductToBillDetails(itemProduct.getId(), id_bills,
                 itemProduct.getQuantity(), itemProduct.getQuantity() * itemProduct.getPrice())) {
-//              billDao.degreeAmountWhenOderingSuccessfully(itemProduct.getId(),itemProduct.getQuantity());
+              // billDao.degreeAmountWhenOderingSuccessfully(itemProduct.getId(),itemProduct.getQuantity());
             }
           }
 
