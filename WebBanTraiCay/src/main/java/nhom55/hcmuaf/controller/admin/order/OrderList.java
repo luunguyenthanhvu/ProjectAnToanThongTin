@@ -31,6 +31,9 @@ public class OrderList extends HttpServlet {
         int totalRow = billDao.countTotalRowProductInDatabase();
         int haveMaxPage = (totalRow/quantityDefault) +1;
         List<Bills> listBills = billDao.get10BillsForEachPage(pageNumber,quantityDefault);
+        for (Bills b : listBills) {
+            System.out.println(b.isVerify());
+        }
         RequestDispatcher dispatcher = this.getServletContext()
                 .getRequestDispatcher("/WEB-INF/admin/order-list.jsp");
         request.setAttribute("listBills",listBills);
