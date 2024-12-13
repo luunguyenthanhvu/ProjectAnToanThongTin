@@ -2,7 +2,7 @@
   Created by IntelliJ IDEA.
   User: PC
   Date: 26/03/2024
-  Time: 5:01 PM
+  Time: 5:02 PM
   To change this template use File | Settings | File Templates.
 --%>
 
@@ -11,7 +11,7 @@
 <html lang="en">
 <head>
   <%@ page isELIgnored="false" %>
-  <title>Đổi mật khẩu</title>
+  <title>Thông tin người dùng</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -49,11 +49,10 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/web-css/fix.css">
 
   <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/user-css/user-profile.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/user-css/update-pass.css">
+
 </head>
 <body class="goto-here">
-<nav class="navbar-container navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light"
-     id="ftco-navbar">
+<nav class="navbar-container navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
   <div class="container navbar-container">
     <div class="navbar-brand">
       <a class="navbar-brand" href="${pageContext.request.contextPath}/page/home">Cửa Hàng Trái Cây</a>
@@ -91,7 +90,9 @@
     margin-left: 250px;
   }
 </style>
+
 <!-- END nav -->
+
 <div class="main-user-content" style="background-color: #e7e6e6; width: 100%">
   <div class="container">
     <div class="container-child-left">
@@ -100,7 +101,7 @@
         <span>Quản lý người dùng</span>
       </div>
       <ul>
-        <li>
+        <li >
           <a href="${pageContext.request.contextPath}/page/user/user-profile?id=${user.getId()}">
             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 288A144 144 0 1 0 256 0a144 144 0 1 0 0 288zm-94.7 32C72.2 320 0 392.2 0 481.3c0 17 13.8 30.7 30.7 30.7H481.3c17 0 30.7-13.8 30.7-30.7C512 392.2 439.8 320 350.7 320H161.3z"/></svg>
             Thông tin người dùng
@@ -112,7 +113,7 @@
             Chỉnh sửa thông tin
           </a>
         </li>
-        <li class="active">
+        <li>
           <a href="${pageContext.request.contextPath}/page/user/update-pass?id=${user.getId()}">
             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg>
             Đổi mật khẩu
@@ -131,7 +132,7 @@
             Giỏ Hàng của bạn
           </a>
         </li>
-        <li class="">
+        <li class="active">
           <a href="${pageContext.request.contextPath}/page/user/general-key-info">
             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 64c-44.2 0-80 35.8-80 80l0 48 240 0c35.3 0 64 28.7 64 64l0 192c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 256c0-35.3 28.7-64 64-64l16 0 0-48C80 64.5 144.5 0 224 0c57.5 0 107 33.7 130.1 82.3c7.6 16 .8 35.1-15.2 42.6s-35.1 .8-42.6-15.2C283.4 82.6 255.9 64 224 64zm32 320c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0z"/></svg>
             Thông tin về khóa
@@ -141,79 +142,56 @@
     </div>
 
 
+
     <div class="container-child-right">
-      <h4>Đổi mật khẩu</h4>
-      <hr style="border-top: 1px solid #000000;">
-      <form class="change-password" action="${pageContext.request.contextPath}/page/user/update-pass" method="post">
-        <table style="border-collapse:collapse;
-                    border: none; ">
-          <tr>
-            <td>
-              <label for="old-password">Mật khẩu cũ<span class="not-empty"> *</span></label>
-            </td>
-            <td>
-              <input type="password" id="old-password" name="old-password" value="${oldPass}">
-              <span class="error-msg required" id="old-password-error" style="display: none;"></span>
-              <c:if test="${not empty error_oldPassword}">
-                <p style="color: red"> ${error_oldPassword}</p>
-              </c:if>
-            </td>
-          </tr>
+      <h4>Thông Tin Về Khóa</h4>
+      <div class="line_of_account"></div>
+      <span style="font-size: 20px ">Thông Tin Cơ Bản</span>
+      <br>
+      <br>
 
-          <tr>
-            <td>
-              <label for="new-password">Mật khẩu mới<span class="not-empty"> *</span></label>
-            </td>
-            <td>
-              <input type="password" id="new-password" name="new-password" value="${newPass}">
-              <span class="error-msg required" id="new-password-error" style="display: none;"></span>
-              <c:if test="${not empty error_newPassword}">
-                <p style="color: red"> ${error_newPassword}</p>
-              </c:if>
-              <c:if test="${not empty error_checkOldAndNewPass}">
-                <p style="color: red"> ${error_checkOldAndNewPass}</p>
-              </c:if>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="retype-password">Nhập lại mật khẩu mới<span class="not-empty"> *</span></label>
-            </td>
-            <td>
-              <input type="password" id="retype-password" name="retype-password" value="${retypePass}">
-              <span class="error-msg required" id="retype-password-error" style="display: none;"></span>
-              <span class="error-msg required" id="retype-mismatch-error" style="display: none;"></span>
-              <c:if test="${not empty error_checkNewAndRetypePass}">
-                <p style="color: red;padding: 30px"> ${error_checkNewAndRetypePass}</p>
-              </c:if>
-            </td>
-          </tr>
-        </table>
+      <div class="user-profile" style="margin-right: 50px">
+        <div class="user-basic-info">
+          <table style="border-collapse:collapse;
+                    border: none;width: 100%;">
+            <tr>
+              <td><label for="ten_nd">Chủ sở hữu<span style="color: red">*</span></label></td>
+              <td><span style="position: relative; top: -5px; margin-left: 80px"  id="ten_nd">${user.getUsername()}</span></td>
+            </tr>
+            <td><br></td>
+            <tr>
+              <td><label for="email_nd">Khóa công khai<span style="color: red">*</span></label></td>
+              <td><span style="position: relative; top: -5px; margin-left: 80px" id="email_nd" type="text">${user.getEmail()}
+              </span></td>
+            </tr>
+            <td><br></td>
+            <tr>
+              <td><label for="ngaytao_nd">Ngày tạo<span style="color: red">*</span></label></td>
+              <td><span style="position: relative; top: -5px; margin-left: 80px" id="ngaytao_nd" type="text">${user.getEmail()}
+              </span></td>
+            </tr>
+            <td><br></td>
+            <tr>
+              <td colspan="2" style="text-align: center;">
+                <button onclick="createNewAPairKey()" style="color: white;background-color: #048a258c; box-sizing: border-box; border-radius: 5%;padding: 10px; margin-right: 10px;  cursor: pointer;  transition: all 0.3s ease;"   onmouseover="this.style.backgroundColor='#036C1F'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#048a258c'; this.style.transform='scale(1)';">
+                  <svg height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M63.8 409.3l60.5-59c32.1 42.8 71.1 66 126.6 67.4 30.5 .7 60.3-7 86.4-22.4 5.1 5.3 18.5 19.5 20.9 22-32.2 20.7-69.6 31.1-108.1 30.2-43.3-1.1-84.6-16.7-117.7-44.4 .3-.6-38.2 37.5-38.6 37.9 9.5 29.8-13.1 62.4-46.3 62.4C20.7 503.3 0 481.7 0 454.9c0-34.3 33.1-56.6 63.8-45.6zm354.9-252.4c19.1 31.3 29.6 67.4 28.7 104-1.1 44.8-19 87.5-48.6 121 .3 .3 23.8 25.2 24.1 25.5 9.6-1.3 19.2 2 25.9 9.1 11.3 12 10.9 30.9-1.1 42.4-12 11.3-30.9 10.9-42.4-1.1-6.7-7-9.4-16.8-7.6-26.3-24.9-26.6-44.4-47.2-44.4-47.2 42.7-34.1 63.3-79.6 64.4-124.2 .7-28.9-7.2-57.2-21.1-82.2l22.1-21zM104 53.1c6.7 7 9.4 16.8 7.6 26.3l45.9 48.1c-4.7 3.8-13.3 10.4-22.8 21.3-25.4 28.5-39.6 64.8-40.7 102.9-.7 28.9 6.1 57.2 20 82.4l-22 21.5C72.7 324 63.1 287.9 64.2 250.9c1-44.6 18.3-87.6 47.5-121.1l-25.3-26.4c-9.6 1.3-19.2-2-25.9-9.1-11.3-12-10.9-30.9 1.1-42.4C73.5 40.7 92.2 41 104 53.1zM464.9 8c26 0 47.1 22.4 47.1 48.3S490.9 104 464.9 104c-6.3 .1-14-1.1-15.9-1.8l-62.9 59.7c-32.7-43.6-76.7-65.9-126.9-67.2-30.5-.7-60.3 6.8-86.2 22.4l-21.1-22C184.1 74.3 221.5 64 260 64.9c43.3 1.1 84.6 16.7 117.7 44.6l41.1-38.6c-1.5-4.7-2.2-9.6-2.2-14.5C416.5 29.7 438.9 8 464.9 8zM256.7 113.4c5.5 0 10.9 .4 16.4 1.1 78.1 9.8 133.4 81.1 123.8 159.1-9.8 78.1-81.1 133.4-159.1 123.8-78.1-9.8-133.4-81.1-123.8-159.2 9.3-72.4 70.1-124.6 142.7-124.8zm-59 119.4c.6 22.7 12.2 41.8 32.4 52.2l-11 51.7h73.7l-11-51.7c20.1-10.9 32.1-29 32.4-52.2-.4-32.8-25.8-57.5-58.3-58.3-32.1 .8-57.3 24.8-58.2 58.3zM256 160"></path></svg>
+                  Tạo khóa mới</button>
+                <button onclick="reportAPairKey()" style="color: white;background-color: #ff00007a; box-sizing: border-box; border-radius: 5%;padding: 10px; margin-right: 10px;cursor: pointer;  transition: all 0.3s ease;"onmouseover="this.style.backgroundColor='rgba(183,4,4,0.91)'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#ff00007a'; this.style.transform='scale(1)';">
+                  <svg height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M63.8 409.3l60.5-59c32.1 42.8 71.1 66 126.6 67.4 30.5 .7 60.3-7 86.4-22.4 5.1 5.3 18.5 19.5 20.9 22-32.2 20.7-69.6 31.1-108.1 30.2-43.3-1.1-84.6-16.7-117.7-44.4 .3-.6-38.2 37.5-38.6 37.9 9.5 29.8-13.1 62.4-46.3 62.4C20.7 503.3 0 481.7 0 454.9c0-34.3 33.1-56.6 63.8-45.6zm354.9-252.4c19.1 31.3 29.6 67.4 28.7 104-1.1 44.8-19 87.5-48.6 121 .3 .3 23.8 25.2 24.1 25.5 9.6-1.3 19.2 2 25.9 9.1 11.3 12 10.9 30.9-1.1 42.4-12 11.3-30.9 10.9-42.4-1.1-6.7-7-9.4-16.8-7.6-26.3-24.9-26.6-44.4-47.2-44.4-47.2 42.7-34.1 63.3-79.6 64.4-124.2 .7-28.9-7.2-57.2-21.1-82.2l22.1-21zM104 53.1c6.7 7 9.4 16.8 7.6 26.3l45.9 48.1c-4.7 3.8-13.3 10.4-22.8 21.3-25.4 28.5-39.6 64.8-40.7 102.9-.7 28.9 6.1 57.2 20 82.4l-22 21.5C72.7 324 63.1 287.9 64.2 250.9c1-44.6 18.3-87.6 47.5-121.1l-25.3-26.4c-9.6 1.3-19.2-2-25.9-9.1-11.3-12-10.9-30.9 1.1-42.4C73.5 40.7 92.2 41 104 53.1zM464.9 8c26 0 47.1 22.4 47.1 48.3S490.9 104 464.9 104c-6.3 .1-14-1.1-15.9-1.8l-62.9 59.7c-32.7-43.6-76.7-65.9-126.9-67.2-30.5-.7-60.3 6.8-86.2 22.4l-21.1-22C184.1 74.3 221.5 64 260 64.9c43.3 1.1 84.6 16.7 117.7 44.6l41.1-38.6c-1.5-4.7-2.2-9.6-2.2-14.5C416.5 29.7 438.9 8 464.9 8zM256.7 113.4c5.5 0 10.9 .4 16.4 1.1 78.1 9.8 133.4 81.1 123.8 159.1-9.8 78.1-81.1 133.4-159.1 123.8-78.1-9.8-133.4-81.1-123.8-159.2 9.3-72.4 70.1-124.6 142.7-124.8zm-59 119.4c.6 22.7 12.2 41.8 32.4 52.2l-11 51.7h73.7l-11-51.7c20.1-10.9 32.1-29 32.4-52.2-.4-32.8-25.8-57.5-58.3-58.3-32.1 .8-57.3 24.8-58.2 58.3zM256 160"></path></svg>
+                  Report khóa</button>
+              </td>
+            </tr>
 
-        <div class="btn-group">
-          <button type="submit" id="submit">
-            Cập nhật mật khẩu
-            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
-              <path d="M288 109.3V352c0 17.7-14.3 32-32 32s-32-14.3-32-32V109.3l-73.4 73.4c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L288 109.3zM64 352H192c0 35.3 28.7 64 64 64s64-28.7 64-64H448c35.3 0 64 28.7 64 64v32c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V416c0-35.3 28.7-64 64-64zM432 456a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/>
-            </svg>
-          </button>
 
-          <button type="reset">
-            Làm mới
-            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
-              <path d="M463.5 224H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5z"/>
-            </svg>
-          </button>
+
+          </table>
         </div>
-        <c:if test="${not empty result}">
-          <p style="color: red;padding: 30px"> ${result}</p>
-        </c:if>
-      </form>
+
+      </div>
+      <p style="color: red;padding: 30px"> ${result}</p>
     </div>
+
   </div>
-</div>
-
-
 </div>
 
 
@@ -226,85 +204,7 @@
   </svg>
 </div>
 
-<script>
-  // validate for input
-  var oldPass = document.getElementById("old-password");
-  var newPass = document.getElementById("new-password");
-  var retypePass = document.getElementById("retype-password");
-
-  function validateOldPassword() {
-    var text = document.getElementById("old-password").value;
-    var error = document.getElementById("old-password-error");
-
-    if (text.length === 0 || text === null) {
-      error.textContent = "Vui lòng nhập mật khẩu cũ";
-      error.style.display = "block";
-      return false;
-    } else {
-      error.style.display = "none";
-      return true;
-    }
-  }
-
-  function validateNewPassword() {
-    var text = document.getElementById("new-password").value;
-    var error = document.getElementById("new-password-error");
-
-    if (text.length === 0 || text === null) {
-      error.textContent = "Vui lòng nhập mật khẩu mới";
-      error.style.display = "block";
-      return false;
-    } else if (text.length < 6) {
-      error.textContent = "Mật khẩu mới phải chứa ít nhất 6 ký tự";
-      error.style.display = "block";
-      return false;
-    } else {
-      error.style.display = "none";
-      return true;
-    }
-  }
-
-  function validateRetypePassword() {
-    var newPassword = document.getElementById("new-password").value;
-    var retypePassword = document.getElementById("retype-password").value;
-    var retypeError = document.getElementById("retype-password-error");
-    var mismatchError = document.getElementById("retype-mismatch-error");
-
-    if (retypePassword.length === 0 || retypePassword === null) {
-      retypeError.textContent = "Vui lòng nhập lại mật khẩu mới.";
-      retypeError.style.display = "block";
-      mismatchError.style.display = "none";
-      return false;
-    } else if (newPassword !== retypePassword) {
-      retypeError.style.display = "none";
-      mismatchError.style.display = "block";
-      return false;
-    } else {
-      retypeError.style.display = "none";
-      mismatchError.style.display = "none";
-      return true;
-    }
-  }
-
-  // add event to check input
-  oldPass.addEventListener("blur", validateOldPassword);
-  newPass.addEventListener("blur", validateNewPassword);
-  retypePass.addEventListener("blur", validateRetypePassword);
-
-  // stop user send post to server
-  var submit = document.getElementById("submit");
-  submit.addEventListener("click", function (event) {
-    var isOldPass = validateOldPassword();
-    var isNewPass = validateNewPassword();
-    var isRetypePass = validateRetypePassword();
-    if (!isOldPass || !isNewPass || !isRetypePass) {
-      event.preventDefault();
-    }
-  })
-
-</script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/popper.min.js"></script>
@@ -321,6 +221,6 @@
 <script src="${pageContext.request.contextPath}/https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
 <script src="${pageContext.request.contextPath}/static/js/google-map.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/main.js"></script>
-
+<script src="${pageContext.request.contextPath}/static/js/web-js/check-password-from-KeyPairUser.js?=8"></script>
 </body>
 </html>
