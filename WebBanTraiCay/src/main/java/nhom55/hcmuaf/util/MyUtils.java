@@ -153,10 +153,14 @@ public class MyUtils {
     return userHashSession.get(id);
   }
 
+  /**
+   * This method use for hash bill to verify signature
+   * @param bills
+   * @return hash bill
+   */
   public static String convertBillsJson(Bills bills) {
     return convertToJson(Bills
         .builder()
-        .id(bills.getId())
         .orderedDate(bills.getOrderedDate())
         .productList(bills.getProductList())
         .userId(bills.getUserId())
