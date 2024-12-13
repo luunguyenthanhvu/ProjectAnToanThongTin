@@ -62,17 +62,15 @@ public class OrderDetailsAPI extends HttpServlet {
     try {
       String context = request.getPathInfo();
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
-      productService = new ProductService();
-      productService.begin();
       switch (context) {
         case "/check-signature":
           VerifyBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
               VerifyBillRequestDTO.class);
           System.out.println("DTO id nè");
           System.out.println(dto);
-          out.println(MyUtils.convertToJson(
-              MessageResponseDTO.builder().message("Verify success!")));
-          out.flush();
+          MessageResponseDTO message = new MessageResponseDTO("Verify success!");
+          String jsonResponse = MyUtils.convertToJson(message);
+          out.println(jsonResponse);
           break;
       }
 
@@ -81,8 +79,9 @@ public class OrderDetailsAPI extends HttpServlet {
       e.printStackTrace();
       throw new MyHandleException("Loi server", 500);
     } finally {
-
+      System.out.println("flush và flush buffer");
       out.flush();
+      response.flushBuffer();
     }
   }
 }
