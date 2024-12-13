@@ -42,6 +42,13 @@ public class CreateAKeyPairForUser extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Users user = MyUtils.getLoginedUser(session);
+        Boolean isVerified = (Boolean) session.getAttribute("isAllowedEditedKeyPair");
+        if(!isVerified){
+            doGet(request,response);
+        }else{
 
+        }
     }
 }
