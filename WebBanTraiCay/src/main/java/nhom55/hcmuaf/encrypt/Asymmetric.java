@@ -23,7 +23,8 @@ public interface Asymmetric {
     }
     Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
     Base64.Decoder BASE64_DECODER = Base64.getDecoder();
-    KeyPair generateKeyPair(Asymmetric.AVAILABLE_SIZE size) throws NoSuchAlgorithmException;
+    KeyPair generateKeyPair(AVAILABLE_SIZE size) throws NoSuchAlgorithmException;
+    KeyPair generateKeyPair() throws NoSuchAlgorithmException;
     String getPrivateKeyAsString();
     String getPublicKeyAsString();
     void loadPrivateKeyAsString(String privateKeyAsString) throws NoSuchAlgorithmException, InvalidKeySpecException;

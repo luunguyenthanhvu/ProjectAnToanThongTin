@@ -8,18 +8,28 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 public class HashImpl implements Hash {
+    String algorithm;
+
+    public HashImpl() {
+        this(ALGORITHM.SHA_512);
+    }
+
+    public HashImpl(ALGORITHM algorithm) {
+        this.algorithm = algorithm.name;
+    }
+
     @Override
-    public String hashText(String text, ALGORITHM algorithm) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance(algorithm.name);
+    public String hashText(String text) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(algorithm);
         byte[] hashedBytes = digest.digest(text.getBytes());
         return HexFormat.of().formatHex(hashedBytes);
     }
 
     @Override
-    public String hashFile(File file, ALGORITHM algorithm) {
+    public String hashFile(File file) {
         try (FileInputStream fis = new FileInputStream(file)) {
             // Tạo đối tượng MessageDigest với thuật toán được chỉ định
-            MessageDigest digest = MessageDigest.getInstance(algorithm.name);
+            MessageDigest digest = MessageDigest.getInstance(algorithm);
 
             // Đọc file theo từng khối để băm
             byte[] buffer = new byte[8192];
