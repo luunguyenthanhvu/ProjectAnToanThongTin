@@ -7,9 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import nhom55.hcmuaf.dto.request.VerifyBillRequestDTO;
 import nhom55.hcmuaf.dto.response.MessageResponseDTO;
 import nhom55.hcmuaf.my_handle_exception.MyHandleException;
+import nhom55.hcmuaf.services.BillService;
 import nhom55.hcmuaf.services_remaster.ProductService;
 import nhom55.hcmuaf.util.MyUtils;
 
@@ -17,6 +17,7 @@ import nhom55.hcmuaf.util.MyUtils;
 public class OrderDetailsAPI extends HttpServlet {
 
   private ProductService productService;
+  private BillService billService;
   private final String REQUEST_BODY = "request-body";
 
   @Override
@@ -24,6 +25,7 @@ public class OrderDetailsAPI extends HttpServlet {
     super.init();
     // Initialize the ProductService here
     this.productService = new ProductService();
+    this.billService = new BillService();
   }
 
   @Override
@@ -62,17 +64,10 @@ public class OrderDetailsAPI extends HttpServlet {
     try {
       String context = request.getPathInfo();
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
-      productService = new ProductService();
-      productService.begin();
       switch (context) {
         case "/check-signature":
-          VerifyBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
-              VerifyBillRequestDTO.class);
-          System.out.println("DTO id nè");
-          System.out.println(dto);
-          out.println(MyUtils.convertToJson(
-              MessageResponseDTO.builder().message("Verify success!")));
-          out.flush();
+          MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO);
+          out.println(MyUtils.convertToJson(message));
           break;
       }
 
@@ -81,8 +76,9 @@ public class OrderDetailsAPI extends HttpServlet {
       e.printStackTrace();
       throw new MyHandleException("Loi server", 500);
     } finally {
-
+      System.out.println("flush và flush buffer");
       out.flush();
+      response.flushBuffer();
     }
   }
 }
