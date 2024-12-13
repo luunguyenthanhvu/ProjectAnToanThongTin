@@ -7,7 +7,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import nhom55.hcmuaf.dto.request.VerifyBillRequestDTO;
 import nhom55.hcmuaf.dto.response.MessageResponseDTO;
 import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.services_remaster.ProductService;
@@ -64,10 +63,7 @@ public class OrderDetailsAPI extends HttpServlet {
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
       switch (context) {
         case "/check-signature":
-          VerifyBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
-              VerifyBillRequestDTO.class);
-          System.out.println("DTO id nè");
-          System.out.println(dto);
+
           MessageResponseDTO message = new MessageResponseDTO("Verify success!");
           String jsonResponse = MyUtils.convertToJson(message);
           out.println(jsonResponse);
