@@ -358,21 +358,27 @@
 
                 </div>
                 <div class="right-container">
-                    <form action="" method="post">
-                        <div class="update-status">
-                            <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
-                                  method="post">
-                                <h3>Cập nhập trạng thái</h3>
-                                <input type="hidden" name="idBill" value="${idBill}">
-                                <select class="option-status" name="selectedStatus">
-                                    <option>Đang xử lý</option>
-                                    <option>Đang giao</option>
-                                    <option>Đã giao</option>
-                                    <option>Đã hủy</option>
-                                </select>
+                    <div>
+                        <div class="order-verification">
+                            <!-- Nút kiểm tra chữ ký -->
+                            <button id="check-signature-btn" onclick="checkSignature(${idBill})">
+                                Kiểm tra tính hợp lệ
+                            </button>
+                            <div id="update-status-form" style="display: none;">
+                                <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
+                                      method="post">
+                                    <h3>Cập nhập trạng thái</h3>
+                                    <input type="hidden" name="idBill" value="${idBill}">
+                                    <select class="option-status" name="selectedStatus">
+                                        <option>Đang xử lý</option>
+                                        <option>Đang giao</option>
+                                        <option>Đã giao</option>
+                                        <option>Đã hủy</option>
+                                    </select>
 
-                                <button type="submit">Cập nhập trạng thái</button>
-                            </form>
+                                    <button type="submit">Cập nhập trạng thái</button>
+                                </form>
+                            </div>
                         </div>
                         <div class="table-wrapper">
                             <table class="table-sanpham">
@@ -383,8 +389,7 @@
                                     <th style="width: 150px;">Doanh mục</th>
                                     <th style="width: 100px;">Giá tiền</th>
                                     <th style="width: 100px;">Số lượng</th>
-                                    <th style="width: 100px;">Trạng thái</th>
-                                    <th style="width: 70px;"></th>
+                                    <th style="width: 100px;">Tổng tiền</th>
                                 </tr>
 
                                 <c:forEach items="${detailList}" var="billDetail"
@@ -404,27 +409,31 @@
                                                                                 value="${billDetail.getProducts().getPrice()}"/></td>
                                         <td class="so-luong"
                                             value="${billDetail.getQuantity()}">${billDetail.getQuantity()}</td>
-                                        <td class="status">
-                                            <svg style="width: 50px; height: 50px; fill: orange"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 512 512">
-                                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
-                                            </svg>
-                                        </td>
                                         <td class="so-luong">
-                                            <button
-                                                    onclick="getShipmentDetails(${billDetail.getProducts().getId()})"
-                                                    style="cursor: pointer; border: none; color: #fff"
-                                                    type="button"
-                                                    class="btn btn-primary btn-get-product"
-                                                    data-toggle="modal" data-target="#exampleModal">
-                                                <svg style="width: 50px; height: 50px; fill: #6a6aff"
-                                                     xmlns="http://www.w3.org/2000/svg"
-                                                     viewBox="0 0 460 512">
-                                                    <path d="M220.6 130.3l-67.2 28.2V43.2L98.7 233.5l54.7-24.2v130.3l67.2-209.3zm-83.2-96.7l-1.3 4.7-15.2 52.9C80.6 106.7 52 145.8 52 191.5c0 52.3 34.3 95.9 83.4 105.5v53.6C57.5 340.1 0 272.4 0 191.6c0-80.5 59.8-147.2 137.4-158zm311.4 447.2c-11.2 11.2-23.1 12.3-28.6 10.5-5.4-1.8-27.1-19.9-60.4-44.4-33.3-24.6-33.6-35.7-43-56.7-9.4-20.9-30.4-42.6-57.5-52.4l-9.7-14.7c-24.7 16.9-53 26.9-81.3 28.7l2.1-6.6 15.9-49.5c46.5-11.9 80.9-54 80.9-104.2 0-54.5-38.4-102.1-96-107.1V32.3C254.4 37.4 320 106.8 320 191.6c0 33.6-11.2 64.7-29 90.4l14.6 9.6c9.8 27.1 31.5 48 52.4 57.4s32.2 9.7 56.8 43c24.6 33.2 42.7 54.9 44.5 60.3s.7 17.3-10.5 28.5zm-9.9-17.9c0-4.4-3.6-8-8-8s-8 3.6-8 8 3.6 8 8 8 8-3.6 8-8z"/>
-                                                </svg>
-                                            </button>
+                                            <fmt:formatNumber pattern="#,##0 đ"
+                                                              value="${billDetail.getQuantity() * billDetail.getProducts().getPrice()}"/>
                                         </td>
+                                            <%--                                        <td class="status">--%>
+                                            <%--                                            <svg style="width: 50px; height: 50px; fill: orange"--%>
+                                            <%--                                                 xmlns="http://www.w3.org/2000/svg"--%>
+                                            <%--                                                 viewBox="0 0 512 512">--%>
+                                            <%--                                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>--%>
+                                            <%--                                            </svg>--%>
+                                            <%--                                        </td>--%>
+                                            <%--                                        <td class="so-luong">--%>
+                                            <%--                                            <button--%>
+                                            <%--                                                    onclick="getShipmentDetails(${billDetail.getProducts().getId()})"--%>
+                                            <%--                                                    style="cursor: pointer; border: none; color: #fff"--%>
+                                            <%--                                                    type="button"--%>
+                                            <%--                                                    class="btn btn-primary btn-get-product"--%>
+                                            <%--                                                    data-toggle="modal" data-target="#exampleModal">--%>
+                                            <%--                                                <svg style="width: 50px; height: 50px; fill: #6a6aff"--%>
+                                            <%--                                                     xmlns="http://www.w3.org/2000/svg"--%>
+                                            <%--                                                     viewBox="0 0 460 512">--%>
+                                            <%--                                                    <path d="M220.6 130.3l-67.2 28.2V43.2L98.7 233.5l54.7-24.2v130.3l67.2-209.3zm-83.2-96.7l-1.3 4.7-15.2 52.9C80.6 106.7 52 145.8 52 191.5c0 52.3 34.3 95.9 83.4 105.5v53.6C57.5 340.1 0 272.4 0 191.6c0-80.5 59.8-147.2 137.4-158zm311.4 447.2c-11.2 11.2-23.1 12.3-28.6 10.5-5.4-1.8-27.1-19.9-60.4-44.4-33.3-24.6-33.6-35.7-43-56.7-9.4-20.9-30.4-42.6-57.5-52.4l-9.7-14.7c-24.7 16.9-53 26.9-81.3 28.7l2.1-6.6 15.9-49.5c46.5-11.9 80.9-54 80.9-104.2 0-54.5-38.4-102.1-96-107.1V32.3C254.4 37.4 320 106.8 320 191.6c0 33.6-11.2 64.7-29 90.4l14.6 9.6c9.8 27.1 31.5 48 52.4 57.4s32.2 9.7 56.8 43c24.6 33.2 42.7 54.9 44.5 60.3s.7 17.3-10.5 28.5zm-9.9-17.9c0-4.4-3.6-8-8-8s-8 3.6-8 8 3.6 8 8 8 8-3.6 8-8z"/>--%>
+                                            <%--                                                </svg>--%>
+                                            <%--                                            </button>--%>
+                                            <%--                                        </td>--%>
                                         <input class="tong-tien" type="hidden"
                                                value="${billDetail.getProducts().getPrice() *billDetail.getQuantity()}">
                                     </tr>
@@ -435,7 +444,15 @@
                         <div class="total-product">
                             <div class="grid-container">
                                 <div class="grid-item">Tổng số lượng:</div>
-                                <div class="grid-item total-amount"></div>
+                                <div class="grid-item total-amount">
+                                    <c:set var="totalQuantity" value="0"/>
+                                    <c:forEach var="detail" items="${detailList}">
+                                        <c:set var="totalQuantity"
+                                               value="${totalQuantity + detail.quantity}"/>
+                                    </c:forEach>
+                                    ${totalQuantity}
+                                </div>
+
                                 <div class="grid-item">Tổng phụ:</div>
                                 <div class="grid-item total-sup"></div>
                                 <div class="grid-item">Giá vận chuyển:</div>
@@ -444,10 +461,10 @@
                                 <div class="grid-item total-money"></div>
                             </div>
                         </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
     </section>
     <!-- Button to Open the Modal -->
     <button id="openModalBtn">Open Modal</button>
@@ -513,11 +530,6 @@
   let shipPrice = 30000;
 
   document.addEventListener('DOMContentLoaded', function () {
-    let getAllSL = document.querySelectorAll(".so-luong");
-    // getAllSL.forEach(function (getAll) {
-    //   totalAmount += Number(getAll.innerHTML);
-    // });
-    totalAmountHTMl.innerHTML = totalAmount;
     shipPriceHTML.innerHTML = shipPrice.toLocaleString('vi-VN',
         {style: 'currency', currency: 'VND'});
     let getAllGT = document.querySelectorAll(".tong-tien");

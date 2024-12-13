@@ -7,6 +7,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import nhom55.hcmuaf.dto.request.VerifyBillRequestDTO;
+import nhom55.hcmuaf.dto.response.MessageResponseDTO;
 import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.services_remaster.ProductService;
 import nhom55.hcmuaf.util.MyUtils;
@@ -15,6 +17,7 @@ import nhom55.hcmuaf.util.MyUtils;
 public class OrderDetailsAPI extends HttpServlet {
 
   private ProductService productService;
+  private final String REQUEST_BODY = "request-body";
 
   @Override
   public void init() throws ServletException {
@@ -53,6 +56,33 @@ public class OrderDetailsAPI extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    // Implement POST method if needed
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    PrintWriter out = response.getWriter();
+    try {
+      String context = request.getPathInfo();
+      String requestDTO = (String) request.getAttribute(REQUEST_BODY);
+      productService = new ProductService();
+      productService.begin();
+      switch (context) {
+        case "/check-signature":
+          VerifyBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
+              VerifyBillRequestDTO.class);
+          System.out.println("DTO id nè");
+          System.out.println(dto);
+          out.println(MyUtils.convertToJson(
+              MessageResponseDTO.builder().message("Verify success!")));
+          out.flush();
+          break;
+      }
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new MyHandleException("Loi server", 500);
+    } finally {
+
+      out.flush();
+    }
   }
 }

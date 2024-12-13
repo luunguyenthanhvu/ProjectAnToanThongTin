@@ -22,6 +22,20 @@
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<style>
+  .verified {
+    color: green;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+  .not-verified {
+    color: red;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+</style>
 <body onload="myFunction()" style="margin:0;">
 <div id="loader"></div>
 <div style="display:none;" id="myDiv" class="animate-bottom">
@@ -271,8 +285,8 @@
                         <th style="width: 200px;">Tên người dùng</th>
                         <th style="width: 150px;">Ngày đặt hàng</th>
                         <th style="width: 150px;">Tổng tiền</th>
-                        <th style="width: 150px;">Tình trạng</th>
-                        <th style="width: 100px;"></th>
+                        <th style="width: 150px;">Trạng thái</th>
+                        <th style="width: 50px;"></th>
                     </tr>
                     <c:forEach items="${listBills}" var="bill">
                         <tr style="background-color: #fff">
