@@ -63,7 +63,7 @@ public class BillDaoImpl implements BillDao {
   @Override
   public int getIDAListProductFromBills(LocalDateTime orderedDate, int idUser) {
     int result = 0;
-   result = JDBIConnector.get().withHandle(handle -> {
+    result = JDBIConnector.get().withHandle(handle -> {
       return handle.createQuery(
               "SELECT id from bills where orderedDate = :orderedDate and userId = :idUser ")
           .bind("orderedDate", orderedDate)
@@ -237,6 +237,16 @@ public class BillDaoImpl implements BillDao {
     JDBIConnector.get().withHandle(h -> {
       return h.createUpdate("update bills set status = :status where id = :idBill")
           .bind("status", status)
+          .bind("idBill", idBill)
+          .execute();
+    });
+  }
+
+  @Override
+  public void updateSignatureABill(int idBill, String signature) {
+    JDBIConnector.get().withHandle(h -> {
+      return h.createUpdate("UPDATE bills set signature = :signature where id = :idBill")
+          .bind("signature", signature)
           .bind("idBill", idBill)
           .execute();
     });

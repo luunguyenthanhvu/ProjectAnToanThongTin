@@ -9,7 +9,7 @@ public class PublicKeyDAOImpl implements PublicKeyDAO {
   @Override
   public int insertPublicKey(PublicKey publicKey) {
     return JDBIConnector.get().withHandle(handle -> {
-      return handle.createUpdate("INSERT INTO public_key(key,createDate)"
+      return handle.createUpdate("INSERT INTO public_key(`key`,createDate)"
               + "VALUES (:key, :createDate)")
           .bind("key", publicKey.getKey())
           .bind("createDate", publicKey.getCreateDate())

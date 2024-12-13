@@ -37,4 +37,6 @@ public interface BillDao {
   public void updateStatusABill(int idBill, String status);
 
   public int getIdUser(int idBill);
+
+  void updateSignatureABill(int idBill, String signature);
 }
