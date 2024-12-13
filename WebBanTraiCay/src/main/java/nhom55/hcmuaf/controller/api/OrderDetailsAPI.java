@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nhom55.hcmuaf.dto.response.MessageResponseDTO;
 import nhom55.hcmuaf.my_handle_exception.MyHandleException;
+import nhom55.hcmuaf.services.BillService;
 import nhom55.hcmuaf.services_remaster.ProductService;
 import nhom55.hcmuaf.util.MyUtils;
 
@@ -16,6 +17,7 @@ import nhom55.hcmuaf.util.MyUtils;
 public class OrderDetailsAPI extends HttpServlet {
 
   private ProductService productService;
+  private BillService billService;
   private final String REQUEST_BODY = "request-body";
 
   @Override
@@ -23,6 +25,7 @@ public class OrderDetailsAPI extends HttpServlet {
     super.init();
     // Initialize the ProductService here
     this.productService = new ProductService();
+    this.billService = new BillService();
   }
 
   @Override
@@ -63,10 +66,8 @@ public class OrderDetailsAPI extends HttpServlet {
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
       switch (context) {
         case "/check-signature":
-
-          MessageResponseDTO message = new MessageResponseDTO("Verify success!");
-          String jsonResponse = MyUtils.convertToJson(message);
-          out.println(jsonResponse);
+          MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO);
+          out.println(MyUtils.convertToJson(message));
           break;
       }
 

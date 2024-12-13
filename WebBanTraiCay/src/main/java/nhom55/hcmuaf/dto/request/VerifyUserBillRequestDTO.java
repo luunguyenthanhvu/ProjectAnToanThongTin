@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VerifyBillRequestDTO {
+public class VerifyUserBillRequestDTO {
 
   private int idBill;
 }
