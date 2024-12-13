@@ -814,7 +814,7 @@ INSERT INTO `voucher` (`id`, `idUser`, `title`, `content`, `beginDate`, `endDate
 CREATE TABLE `public_key` (
   `id` int(11) NOT NULL,
   `key` text DEFAULT NULL,
-  `createDate` date NOT NULL
+  `createDate` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Tao bang userPublicKey
