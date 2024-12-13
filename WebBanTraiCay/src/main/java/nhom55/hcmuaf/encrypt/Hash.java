@@ -15,6 +15,6 @@ public interface Hash {
             this.name = name;
         }
     }
-    String hashText(String text, Hash.ALGORITHM algorithm) throws NoSuchAlgorithmException;
-    String hashFile(File file, Hash.ALGORITHM algorithm);
+    String hashText(String text) throws NoSuchAlgorithmException;
+    String hashFile(File file);
 }

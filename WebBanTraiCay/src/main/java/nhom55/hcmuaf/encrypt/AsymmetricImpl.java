@@ -31,11 +31,16 @@ public class AsymmetricImpl implements Asymmetric {
     }
 
     @Override
-    public KeyPair generateKeyPair(Asymmetric.AVAILABLE_SIZE constSize) throws NoSuchAlgorithmException {
+    public KeyPair generateKeyPair(AVAILABLE_SIZE constSize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(constSize.size);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         return keyPair;
+    }
+
+    @Override
+    public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+        return generateKeyPair(AVAILABLE_SIZE.KEY_SIZE_4);
     }
 
     @Override
