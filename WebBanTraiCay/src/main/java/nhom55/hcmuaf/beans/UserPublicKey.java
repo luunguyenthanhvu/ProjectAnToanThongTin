@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import nhom55.hcmuaf.enums.PublicKeyStatus;
 import nhom55.hcmuaf.log.IModel;
 import nhom55.hcmuaf.log.Log;
 
@@ -18,7 +19,7 @@ public class UserPublicKey extends Log<PublicKey> implements Serializable, IMode
   int id;
   int idUser;
   int idPublicKey;
-  String status;
+  PublicKeyStatus status;
 
   @Override
   public String getTable() {
