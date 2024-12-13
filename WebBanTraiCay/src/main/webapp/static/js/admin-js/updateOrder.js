@@ -112,7 +112,7 @@ function checkSignature(idBill) {
         if (response.message === "Verify success!") {
           Swal.fire({
             icon: 'success',
-            title: 'Cập nhật trạng thái thành công!',
+            title: 'Đơn hàng hợp lệ!',
             text: 'Bạn có thể cập nhật trạng thái đơn hàng.'
           }).then(() => {
             $('#update-status-form').show();
@@ -121,8 +121,8 @@ function checkSignature(idBill) {
         } else {
           Swal.fire({
             icon: 'error',
-            title: 'Cập nhật thất bại',
-            text: 'Không thể cập nhật trạng thái. Vui lòng thử lại.'
+            title: 'Đơn hàng không hợp lệ!',
+            text: 'Không thể xử lý đơn hàng này. Vui lòng xác minh chữ ký.'
           });
         }
       },
