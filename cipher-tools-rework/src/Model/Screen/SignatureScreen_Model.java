@@ -2,6 +2,7 @@ package Model.Screen;
 
 import java.io.File;
 import java.security.Key;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,19 +15,17 @@ public class SignatureScreen_Model implements ModelObservable {
     private List<ScreenObserver> observers = new ArrayList<>();
     private String publicKey;
     private String privateKey;
-    private Class<? extends Key> usingKey;
+    private Class<? extends Key> usingKey = PrivateKey.class;
     private String inputSignature;
     private String inputText;
-    private int keySize;
-    private String algorithm;
+    private int keySize = 4096;
+    private String algorithm = "SHA-512";
     static List<String> availableAlgorithm = new ArrayList<>(){{
         add("MD5");
         add("SHA-1");
         add("SHA-256");
         add("SHA-384");
         add("SHA-512");
-        add("SHA3-256");
-        add("SHA3-512");
     }};
     static List<Integer> availableKeySize = new ArrayList<>(){{
         add(1024);

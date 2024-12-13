@@ -91,7 +91,7 @@ public class AsymmetricAlgorithm {
         } else {
             throw new IllegalArgumentException("Unsupported key type: " + clazz.getName());
         }
-
+        System.out.println("Text: "+text);
         byte[] encryptedBytes = cipher.doFinal(text.getBytes());
         return BASE64_ENCODER.encodeToString(encryptedBytes);
     }

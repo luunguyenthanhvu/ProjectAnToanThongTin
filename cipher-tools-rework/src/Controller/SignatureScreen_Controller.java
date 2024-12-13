@@ -30,24 +30,28 @@ public class SignatureScreen_Controller extends AController<SignatureScreen_View
     @Override
     protected void initialCallbacks() {
         view.onChangeInputType(newInput -> handleChangeInputMode(newInput));
-        view.onChooseAlgorithm_ComboBox(algorithm -> handleChooseAlgorithm(algorithm));
-        view.onChooseKeySize_ComboBox(size -> handleChooseKeySize(size));
-        view.onGenerateKeyButton_Click(x -> handleGenerateKeyButton_Click());
         view.onInputTextChange(inputText -> model.setInputText(inputText));
         view.onCreateSignatureButton_Click(x -> handleCreateSignatureButton());
-        view.onChooseUsageKey(clazz -> model.setUsingKey(clazz));
         view.onChangeSignatureInputText(signatureInput -> model.setInputSignature(signatureInput));
         view.onCheckingSignatureButton_Click(x -> handleCheckingSignatureButton_Click());
         view.onLoadFileButton_Click(x -> model.notifyObservers("open_file_chooser_for_chosen_file", Map.of()));
         view.onInputFileChosen(file -> model.setFile(file));
-        view.onSavePrivateKeyButton_Click(a -> view.openJFileChooser_ForSavePrivateKey());
         view.onLoadPrivateKeyButton_Click(a -> view.openJFileChooser_ForLoadPrivateKey());
-        view.onSavePublicKeyButton_Click(a -> view.openJFileChooser_ForSavePublicKey());
-        view.onLoadPublicKeyButton_Click(a -> view.openJFileChooser_ForLoadPublicKey());
         view.onChooseLocation_ForLoadPrivateKey(file -> handleOnChooseLocation_ForLoadPrivateKey(file));
         view.onChooseLocation_ForSavePrivateKey(file -> handleOnChooseLocation_ForSavePrivateKey(file));
         view.onChooseLocation_ForSavePublicKey(file -> handleOnChooseLocation_ForSavePublicKey(file));
         view.onChooseLocation_ForLoadPublicKey(file -> handleOnChooseLocation_ForLoadPublicKey(file));
+        view.onChangePrivateKey(privateKeyStr -> handleOnChangePrivateKey(privateKeyStr));
+    }
+
+    private void handleOnChangePrivateKey(String privateKeyStr) {
+        if (privateKeyStr.isEmpty() || privateKeyStr == null) return; // do nothing
+        model.setPrivateKey(privateKeyStr);
+        try {
+            asymmetricAlgorithm.setPrivateKey(privateKeyStr);
+        } catch (GeneralSecurityException e) {
+            throw new MyAppException(ErrorType.CANNOT_RECOGNIZE_PRIVATE_KEY, view);
+        }
     }
 
     private void handleOnChooseLocation_ForLoadPublicKey(File file) {
@@ -230,34 +234,6 @@ public class SignatureScreen_Controller extends AController<SignatureScreen_View
             e.printStackTrace();
             throw new MyAppException(ErrorType.BAD_INPUT_ALGORITHM, view);
         }
-    }
-
-    private void handleGenerateKeyButton_Click() {
-        try {
-            int keySize = model.getKeySize();
-            var keyPair = asymmetricAlgorithm.generateKeyPair(keySize);
-            // load to asymmetric algorithm model
-            asymmetricAlgorithm.setPrivateKey(keyPair.getPrivate());
-            asymmetricAlgorithm.setPublicKey(keyPair.getPublic());
-            String privateKey = asymmetricAlgorithm.getPrivateKeyAsString();
-            String publicKey = asymmetricAlgorithm.getPublicKeyAsString();
-            model.setPrivateKey(privateKey);
-            model.setPublicKey(publicKey);
-            model.notifyObservers("generated_key_pair", Map.of(
-                    "generated_private_key", privateKey,
-                    "generated_public_key", publicKey
-            ));
-        } catch (NoSuchAlgorithmException e) {
-            throw new MyAppException(ErrorType.UNSUPPORTED_ALGORITHM, view);
-        }
-    }
-
-    private void handleChooseKeySize(Integer size) {
-        model.setKeySize(size);
-    }
-
-    private void handleChooseAlgorithm(String algorithm) {
-        model.setAlgorithm(algorithm);
     }
 
     private void handleChangeInputMode(int newInput) {
