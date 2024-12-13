@@ -3,9 +3,11 @@ package nhom55.hcmuaf.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OrderValidator {
+    private static final String REPEATING_PATTERN_REGEX = "\\b(\\S+?)\\b(?:\\s*\\1)+\\b";
     public static String validateFirstName(String firstName) {
         if (firstName == null || firstName.trim().isEmpty()) {
             return "Vui lòng nhập vào tên của bạn";
@@ -50,6 +52,11 @@ public class OrderValidator {
         if (!address.matches("^[\\s\\S]*$")) {
             return "Địa chỉ chứa chữ cái, chữ số ,/ và ,.";
         }
+        Pattern pattern = Pattern.compile(REPEATING_PATTERN_REGEX, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(address);
+        if(matcher.find()) {
+            return "Địa chỉ không hợp lệ, vui lòng nhập lại";
+        }
 
         return "";
     }
@@ -75,5 +82,9 @@ public class OrderValidator {
             return "Email của bạn không đúng định dạng abc@xyz.abc . Vui lòng nhập lại.";
         }
         return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(OrderValidator.validateAddress("123 Tan An 123 Tan An"));
     }
 }
