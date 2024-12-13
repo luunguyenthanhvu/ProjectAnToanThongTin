@@ -2,9 +2,11 @@ package nhom55.hcmuaf.beans;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import nhom55.hcmuaf.log.IModel;
 import nhom55.hcmuaf.log.Log;
 
+@Builder
 public class Bills extends Log<Users> implements Serializable, IModel {
 
   private int id;

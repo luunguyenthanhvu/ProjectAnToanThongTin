@@ -30,6 +30,9 @@ public class BillService {
 
     // get signature by dto id
     var bill = billDao.getABill(dto.getIdBill());
+
+    // the bill json
+    String billJson = MyUtils.convertBillsJson(bill);
     System.out.println(bill.getSignature());
 
     return null;
