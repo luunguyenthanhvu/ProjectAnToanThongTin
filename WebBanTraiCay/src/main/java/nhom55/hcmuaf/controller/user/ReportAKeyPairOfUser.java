@@ -69,7 +69,6 @@ public class ReportAKeyPairOfUser extends HttpServlet {
             // Viết thêm log khi user report key
             UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
             userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
-            PublicKey publicKeyPreValue = userPublicKeyDAO.getPublicKey(userPublicKeyPreValue.getIdPublicKey());
             userPublicKeyDAO.setStatusUserPublicKey(user.getId(),userPublicKeyPreValue.getIdPublicKey(),PublicKeyStatus.BANNED.name());
 
 
@@ -79,26 +78,17 @@ public class ReportAKeyPairOfUser extends HttpServlet {
             usersPublicKeyLog.setAddress(requestInfo.getAddress());
             usersPublicKeyLog.setNational(requestInfo.getNation());
             usersPublicKeyLog.setLevel(LogLevels.WARNING);
-            usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.name());
+            usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.getLevel());
             usersPublicKeyLog.setCreateAt(timeCreated);
             usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyPreValue));
 
 
-//               Viết log public Key bị report
-            Log<PublicKey> publicKeyLog = new Log<>();
-            publicKeyLog.setIp(requestInfo.getIp());
-            publicKeyLog.setAddress(requestInfo.getAddress());
-            publicKeyLog.setNational(requestInfo.getNation());
-            publicKeyLog.setLevel(LogLevels.WARNING);
-            publicKeyLog.setNote(LogNote.BAN_PUBLIC_KEY.name());
-            publicKeyLog.setCreateAt(timeCreated);
-            publicKeyLog.setCurrentValue(MyUtils.convertToJson(publicKeyPreValue));
+//
 
 
             AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
-            AbsDAO<PublicKey> absPublicKeyDao = new AbsDAO<>();
             absUserDao.insert(usersPublicKeyLog);
-            absPublicKeyDao.insert(publicKeyLog);
+
 
 
             request.setAttribute("isReportKeySuccess", true);

@@ -65,20 +65,37 @@ public class CreateAKeyPairForUser extends HttpServlet {
            if(!isVerified){
                doGet(request,response);
            }else{
+               RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
                Asymmetric asymmetric = new AsymmetricImpl();
+               LocalDateTime timeCreated = LocalDateTime.now();
                asymmetric.loadKeyPair(asymmetric.generateKeyPair());
                String publicKey = asymmetric.getPublicKeyAsString();
                String privateKey = asymmetric.getPrivateKeyAsString();
                UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
-               LocalDateTime timeCreated = LocalDateTime.now();
+               if(userPublicKeyDAO.getUserPublicKey(user.getId()) != null){
+//                   // Ghi log cho public key bị ban
+                   UserPublicKey userPublicKeyReadyToBan = userPublicKeyDAO.getUserPublicKey(user.getId());
+                   userPublicKeyDAO.setStatusUserPublicKey(user.getId(),userPublicKeyReadyToBan.getIdPublicKey(),PublicKeyStatus.BANNED.name());
+                   Log<UserPublicKey> usersPublicKeyLog = new Log<>();
+                   usersPublicKeyLog.setIp(requestInfo.getIp());
+                   usersPublicKeyLog.setNational(requestInfo.getNation());
+                   usersPublicKeyLog.setAddress(requestInfo.getAddress());
+                   usersPublicKeyLog.setLevel(LogLevels.WARNING);
+                   usersPublicKeyLog.setNote(String.valueOf(LogNote.USER_REPORT_PUBLIC_KEY.getLevel()));
+                   usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyReadyToBan));
+                   usersPublicKeyLog.setCreateAt(timeCreated);
+                   AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
+                   absUserDao.insert(usersPublicKeyLog);
+
+               }
+
+
                userPublicKeyDAO.insertPublicKey(publicKey, timeCreated);
                int idPublicKey = userPublicKeyDAO.getIdPublicKey(timeCreated);
                userPublicKeyDAO.insertUserPublicKey(user.getId(), idPublicKey, PublicKeyStatus.IN_USE);
                // Viết thêm log khi user tao key
-               RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
-              PublicKey publicKeyObj = new PublicKey();
-              publicKeyObj.setKey(publicKey);
-              publicKeyObj.setCreateAt(timeCreated);
+
+
                UserPublicKey userPublicKeyObj = new UserPublicKey();
                userPublicKeyObj.setIdUser(user.getId());
                userPublicKeyObj.setIdPublicKey(idPublicKey);
@@ -89,22 +106,15 @@ public class CreateAKeyPairForUser extends HttpServlet {
                usersPublicKeyLog.setNational(requestInfo.getNation());
                usersPublicKeyLog.setAddress(requestInfo.getAddress());
                usersPublicKeyLog.setLevel(LogLevels.ALERT);
-               usersPublicKeyLog.setNote(String.valueOf(LogNote.USER_CREATE_PUBLIC_KEY));
+               usersPublicKeyLog.setNote(String.valueOf(LogNote.USER_CREATE_PUBLIC_KEY.getLevel()));
                usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyObj));
                usersPublicKeyLog.setCreateAt(timeCreated);
 
-//               Viết log public Key được tạo
-               Log<PublicKey> publicKeyLog = new Log<>();
-               publicKeyLog
-               publicKeyLog.setLevel(LogLevels.ALERT);
-               publicKeyLog.setNote(String.valueOf(LogNote.INSERT_PUBLIC_KEY));
-               publicKeyLog.setCurrentValue(MyUtils.convertToJson(publicKeyObj));
-               publicKeyLog.setCreateAt(timeCreated);
+//
 
                AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
-               AbsDAO<PublicKey> absPublicKeyDao = new AbsDAO<>();
                absUserDao.insert(usersPublicKeyLog);
-               absPublicKeyDao.insert(publicKeyLog);
+
 
                request.setAttribute("publicKey", publicKey);
                request.setAttribute("privateKey", privateKey);
