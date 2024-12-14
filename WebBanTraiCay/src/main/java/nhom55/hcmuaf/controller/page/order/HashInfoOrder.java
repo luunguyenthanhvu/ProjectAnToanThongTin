@@ -28,23 +28,28 @@ public class HashInfoOrder extends HttpServlet {
        try{
            HttpSession session = request.getSession();
            Users users = MyUtils.getLoginedUser(session);
-           String lastName = request.getParameter("ho_nguoi-dung");
-           String firstName = request.getParameter("ten_nguoi-dung");
-           String address = request.getParameter("dia-chi_nguoi-dung");
+           String lastName = request.getParameter("ho_nguoi_dung");
+           System.out.println("Ho nguoi dung: " + lastName );
+           String firstName = request.getParameter("ten_nguoi_dung");
+           String address = request.getParameter("dia_chi_nguoi_dung");
            String city = request.getParameter("provinceName");
+           System.out.println("city: " + city);
            String district = request.getParameter("districtName");
-           String phoneNumber = request.getParameter("sdt_nguoi-dung");
-           String email = request.getParameter("email_nguoi-dung");
+           System.out.println("district: " + district);
+           String phoneNumber = request.getParameter("sdt_nguoi_dung");
+           String email = request.getParameter("email_nguoi_dung");
            String deliveryFee = request.getParameter("delivery_fee");
+           System.out.println("deliveryFee: " + deliveryFee);
            String cleanedString = deliveryFee.replaceAll("[₫\\s]", "");
            cleanedString = cleanedString.replace(".", "");
            double deliveryFeeDouble = Double.parseDouble(cleanedString);
-           String note = request.getParameter("note_nguoi-dung");
+           String note = request.getParameter("note_nguoi_dung");
            double subTotalPrice = 0;
            String productNameList = "";
            List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
            CartsEntityWebSocket cart = MyUtils.getCart(session);
            address += ", quận " + district + ", tỉnh " + city;
+           System.out.println(address);
            if(!checkValidate(request, response, lastName, firstName, address, city, phoneNumber, email)){
                JSONObject jsonObject = new JSONObject();
                jsonObject.put("invalidInfo", "true");

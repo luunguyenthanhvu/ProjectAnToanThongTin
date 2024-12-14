@@ -805,7 +805,7 @@
 <%--Js xử lý lấy dữ liệu vận chuyển--%>
 <script src="${pageContext.request.contextPath}/static/js/web-js/process-delivery-fee.js?v=12"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/hash-info-order.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/hash-info-order.js?v=1423"></script>
 </body>
 <%--Css cho Popup Voucher--%>
 <style>
