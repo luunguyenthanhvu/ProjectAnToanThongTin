@@ -264,8 +264,8 @@
                         <div class="w-100"></div>
                         <div class="col-md-6" >
                             <div class="form-group">
-                                <label for="hash_for_user">Thông tin đặt hàng người dùng được hash</label>
-                                <input id="hash_for_user" disabled type="text">
+                                <label for="info_hash_for_user">Thông tin đặt hàng người dùng được hash</label>
+                                <input id="info_hash_for_user"  type="text">
                                 <div style="margin-top: 10px">
                                     <button class="btn btn-primary py-3 px-4" style="margin-right: 40px" type="button" id="buttonHashInfo">Hash</button>
                                     <button class="btn btn-primary py-3 px-4" type="button">Tải file Hash về</button>
@@ -275,9 +275,9 @@
                         <div class="col-md-6" >
                             <div class="form-group">
                                 <label for="signature_from_user">Chữ ký của người dùng</label>
-                                <input id="signature_from_user" type="text">
+                                <input name="signature" id="signature_from_user" type="text">
                                 <div style="margin-top: 10px">
-                                    <button class="btn btn-primary py-3 px-4"  type="button" style="margin-left: 200px">Verify</button>
+
 
                                 </div>
                             </div>

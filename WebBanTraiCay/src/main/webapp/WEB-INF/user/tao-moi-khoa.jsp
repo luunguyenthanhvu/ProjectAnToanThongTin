@@ -111,7 +111,7 @@
         </div>
         <div class="button-group">
           <button class="generate-btn">Tạo mới</button>
-          <button type="button" class="save-btn">Lưu key về máy</button>
+          <button id="save_private_key" type="button" class="save-btn">Lưu key về máy</button>
         </div>
       </form>
     </div>
@@ -146,6 +146,7 @@
 <script src="${pageContext.request.contextPath}/https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
 <script src="${pageContext.request.contextPath}/static/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/check-password-from-KeyPairUser.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/download-private-key.js?=3"></script>
 <script>
   // Kiểm tra giá trị từ server và gọi SweetAlert
   <% if (isCreateKeySuccess != null && isCreateKeySuccess) { %>

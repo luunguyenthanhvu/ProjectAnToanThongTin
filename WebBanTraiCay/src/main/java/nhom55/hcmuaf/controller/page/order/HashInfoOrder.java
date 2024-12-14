@@ -29,17 +29,13 @@ public class HashInfoOrder extends HttpServlet {
            HttpSession session = request.getSession();
            Users users = MyUtils.getLoginedUser(session);
            String lastName = request.getParameter("ho_nguoi_dung");
-           System.out.println("Ho nguoi dung: " + lastName );
            String firstName = request.getParameter("ten_nguoi_dung");
            String address = request.getParameter("dia_chi_nguoi_dung");
            String city = request.getParameter("provinceName");
-           System.out.println("city: " + city);
            String district = request.getParameter("districtName");
-           System.out.println("district: " + district);
            String phoneNumber = request.getParameter("sdt_nguoi_dung");
            String email = request.getParameter("email_nguoi_dung");
            String deliveryFee = request.getParameter("delivery_fee");
-           System.out.println("deliveryFee: " + deliveryFee);
            String cleanedString = deliveryFee.replaceAll("[₫\\s]", "");
            cleanedString = cleanedString.replace(".", "");
            double deliveryFeeDouble = Double.parseDouble(cleanedString);
@@ -48,8 +44,6 @@ public class HashInfoOrder extends HttpServlet {
            String productNameList = "";
            List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
            CartsEntityWebSocket cart = MyUtils.getCart(session);
-           address += ", quận " + district + ", tỉnh " + city;
-           System.out.println(address);
            if(!checkValidate(request, response, lastName, firstName, address, city, phoneNumber, email)){
                JSONObject jsonObject = new JSONObject();
                jsonObject.put("invalidInfo", "true");
@@ -68,7 +62,7 @@ public class HashInfoOrder extends HttpServlet {
                        // Xóa dấu phẩy và khoảng trắng cuối cùng
                        productNameList = productNameList.substring(0, productNameList.length() - 2);
                    }
-                   address += address + ", quận " + district + ", tỉnh " + city;
+                   address += ", quận " + district + ", tỉnh " + city;
                    // Tạo đối tượng JSON
                    JSONObject jsonObject = new JSONObject();
                    jsonObject.put("lastName", lastName);
@@ -85,8 +79,10 @@ public class HashInfoOrder extends HttpServlet {
 
                    // Chuyển đổi đối tượng JSON thành chuỗi
                    String jsonString = jsonObject.toString();
+                   System.out.println("Json 1: " + jsonString);
                    PrintWriter out = response.getWriter();
-                   Hash hash = new HashImpl();
+                   HashImpl hash = new HashImpl();
+                   session.setAttribute("hash",hash);
                    String hashInfoOrder = hash.hashText(jsonString);
                    JSONObject hashObj = new JSONObject();
                    hashObj.put("invalidInfo", "false");

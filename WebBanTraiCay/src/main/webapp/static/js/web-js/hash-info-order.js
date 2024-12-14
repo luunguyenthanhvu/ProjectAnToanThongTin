@@ -34,6 +34,7 @@ async function hashInfoOrder() {
                 alert("Thông tin không hợp lệ!");
             } else {
                 console.log('Hash info order:', data.data);
+                document.getElementById("info_hash_for_user").value = data.data;
             }
         })
         .catch((error) => {

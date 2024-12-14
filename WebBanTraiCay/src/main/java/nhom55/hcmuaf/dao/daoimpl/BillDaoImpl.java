@@ -17,7 +17,7 @@ public class BillDaoImpl implements BillDao {
   public boolean addAListProductToBills(LocalDateTime orderedDate, String productList,
       String status, int userId, int payment, String firstName, String lastName,
       String streetAddress, String city, String phoneNumber, String email, double totalPrice,
-      double deliveryFee, String note) {
+      double deliveryFee, String note, String signature, boolean isVerify) {
 
 //    int count = JDBIConnector.get().withHandle(h -> {
 //      return h.createQuery(
@@ -34,9 +34,9 @@ public class BillDaoImpl implements BillDao {
       JDBIConnector.get().withHandle(h -> {
 
         return h.createUpdate(
-                "INSERT INTO bills(orderedDate, productList, status, userId, payment, firstName, lastName, streetAddress, city, phoneNumber, email,totalPrice,deliveryFee,note,creationTime) "
+                "INSERT INTO bills(orderedDate, productList, status, userId, payment, firstName, lastName, streetAddress, city, phoneNumber, email,totalPrice,deliveryFee,note,signature,isVerify,creationTime) "
                     +
-                    "VALUES (:orderedDate, :productList, :status, :userId, :payment, :firstName, :lastName, :streetAddress, :city, :phoneNumber, :email, :totalPrice, :deliveryFee, :note, :creationTime)")
+                    "VALUES (:orderedDate, :productList, :status, :userId, :payment, :firstName, :lastName, :streetAddress, :city, :phoneNumber, :email, :totalPrice, :deliveryFee, :note,:signature,:isVerify, :creationTime)")
 
             .bind("orderedDate", orderedDate)
             .bind("productList", productList)
@@ -52,6 +52,8 @@ public class BillDaoImpl implements BillDao {
             .bind("totalPrice", totalPrice)
             .bind("deliveryFee", deliveryFee)
             .bind("note", note)
+            .bind("signature", signature)
+            .bind("isVerify", isVerify)
             .bind("creationTime", LocalDateTime.now())
             .execute();
       });
