@@ -3,6 +3,7 @@ package nhom55.hcmuaf.services;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -73,7 +74,7 @@ public class BillService extends AbsDAO {
    * @return
    */
   public MessageResponseDTO checkVerifyUserBill(String requestDTO, HttpServletRequest request)
-      throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+      throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidKeySpecException {
     // Convert request dto to entity
     VerifyUserBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
         VerifyUserBillRequestDTO.class);
@@ -87,15 +88,29 @@ public class BillService extends AbsDAO {
       setUpDefaultData(bill, request);
     }
 
-    // Check bill and check key used When sign the bill
+    // Check bill and check key used when sign the bill
+
     // Get userPublic key in used
-    UserPublicKey userPublicKey = new UserPublicKey();
 
     // the bill json
     String billJson = MyUtils.convertBillsJson(bill);
     String hashBill = hash.hashText(billJson);
 
-    return MessageResponseDTO.builder().message("Verify Success!").build();
+    UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(bill.getUserId());
+    PublicKey publicKey = publicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+    asymmetric.loadPublicKeyAsString(publicKey.getKey());
+    String decryptedSignatureHash = asymmetric.decryptText(bill.getSignature());
+
+    // Compare the hash and decrypted hash
+    if (hashBill.equals(decryptedSignatureHash)) {
+      // If match, verification successful
+      return MessageResponseDTO.builder().message("Verify Success!").build();
+    } else {
+      // If mismatch, verification failed
+      return MessageResponseDTO.builder()
+          .message("Verification Failed: Data has been altered or signature is invalid.")
+          .build();
+    }
   }
 
   private void setUpDefaultData(Bills bill, HttpServletRequest request)

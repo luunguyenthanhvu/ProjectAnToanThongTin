@@ -19,4 +19,15 @@ public class PublicKeyDAOImpl implements PublicKeyDAO {
     });
 
   }
+
+  @Override
+  public PublicKey getPublicKey(int id) {
+    return JDBIConnector.get().withHandle(handle -> {
+      return handle.createQuery("SELECT * FROM public_key where id = :id")
+          .bind("id", id)
+          .mapToBean(PublicKey.class)
+          .findOne()
+          .orElse(null);
+    });
+  }
 }
