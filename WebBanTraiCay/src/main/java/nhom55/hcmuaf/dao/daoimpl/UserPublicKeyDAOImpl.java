@@ -1,5 +1,6 @@
 package nhom55.hcmuaf.dao.daoimpl;
 
+import nhom55.hcmuaf.beans.PublicKey;
 import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.dao.UserPublicKeyDAO;
 import nhom55.hcmuaf.database.JDBIConnector;
@@ -24,6 +25,20 @@ public class UserPublicKeyDAOImpl implements UserPublicKeyDAO {
         }
     }
     @Override
+    public PublicKey getPublicKey(int idPublicKey){
+        try {
+            return JDBIConnector.get().withHandle(
+                    h -> h.createQuery("SELECT * FROM public_key where id = :idPublicKey")
+                            .bind("idPublicKey", idPublicKey)
+                            .mapToBean(PublicKey.class)
+                            .one()
+            );
+        } catch (Exception e) {
+            System.err.println("Error fetching PublicKey for idPublicKey=" + idPublicKey + ": " + e.getMessage());
+            return null;
+        }
+    }
+    @Override
     public String getPublicKeyOfUser(int idUser) {
         String key ="";
        try{
@@ -43,13 +58,21 @@ public class UserPublicKeyDAOImpl implements UserPublicKeyDAO {
     @Override
     public void insertUserPublicKey(int idUser, int idPublicKey, PublicKeyStatus status) {
         try {
-            JDBIConnector.get().withHandle(h ->
-                    h.createUpdate("INSERT INTO user_public_key (idUser, idPublicKey, status) VALUES (:idUser, :idPublicKey, :status)")
-                            .bind("idUser", idUser)
-                            .bind("idPublicKey", idPublicKey)
-                            .bind("status", status)
-                            .execute()
-            );
+            JDBIConnector.get().withHandle(h -> {
+                // Update trạng thái từ IN_USE sang BANNED
+                h.createUpdate("UPDATE user_public_key SET status = :bannedStatus WHERE idUser = :idUser AND status = :inUseStatus")
+                        .bind("idUser", idUser)
+                        .bind("bannedStatus", PublicKeyStatus.BANNED)
+                        .bind("inUseStatus", PublicKeyStatus.IN_USE)
+                        .execute();
+
+                // Insert bản ghi mới
+                return h.createUpdate("INSERT INTO user_public_key (idUser, idPublicKey, status) VALUES (:idUser, :idPublicKey, :status)")
+                        .bind("idUser", idUser)
+                        .bind("idPublicKey", idPublicKey)
+                        .bind("status", status)
+                        .execute();
+            });
         } catch (Exception e) {
             System.err.println("Error inserting UserPublicKey (idUser=" + idUser + ", idPublicKey=" + idPublicKey + "): " + e.getMessage());
         }
@@ -59,7 +82,7 @@ public class UserPublicKeyDAOImpl implements UserPublicKeyDAO {
     public void insertPublicKey(String key, LocalDateTime createDate) {
         try {
             JDBIConnector.get().withHandle(h ->
-                    h.createUpdate("INSERT INTO public_key (key, createDate) VALUES (:key, :createDate)")
+                    h.createUpdate("INSERT INTO public_key (`key`, createDate) VALUES (:key, :createDate)")
                             .bind("key", key)
                             .bind("createDate", createDate)
                             .execute()
@@ -81,6 +104,22 @@ public class UserPublicKeyDAOImpl implements UserPublicKeyDAO {
         } catch (Exception e) {
             System.err.println("Error fetching PublicKey ID for createDate=" + createDate + ": " + e.getMessage());
             return -1; // Giá trị mặc định khi xảy ra lỗi
+        }
+    }
+    @Override
+    public boolean setStatusUserPublicKey(int idUser,int idPublicKey, String status) {
+        try {
+            JDBIConnector.get().withHandle(h ->
+                    h.createUpdate("UPDATE user_public_key SET status = :status WHERE idUser = :idUser AND idPublicKey = :idPublicKey and status = 'IN_USE'")
+                            .bind("idUser", idUser)
+                            .bind("idPublicKey", idPublicKey)
+                            .bind("status", status)
+                            .execute()
+            );
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error updating UserPublicKey (idUser=" + idUser + ", idPublicKey=" + idPublicKey + "): " + e.getMessage());
+            return false;
         }
     }
 }

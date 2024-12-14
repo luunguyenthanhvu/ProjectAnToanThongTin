@@ -1,7 +1,19 @@
 package nhom55.hcmuaf.controller.user;
 
 
+import nhom55.hcmuaf.beans.PublicKey;
+import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.beans.Users;
+import nhom55.hcmuaf.dao.UserPublicKeyDAO;
+import nhom55.hcmuaf.dao.daoimpl.UserPublicKeyDAOImpl;
+import nhom55.hcmuaf.encrypt.Asymmetric;
+import nhom55.hcmuaf.encrypt.AsymmetricImpl;
+import nhom55.hcmuaf.enums.LogLevels;
+import nhom55.hcmuaf.enums.LogNote;
+import nhom55.hcmuaf.enums.PublicKeyStatus;
+import nhom55.hcmuaf.log.AbsDAO;
+import nhom55.hcmuaf.log.Log;
+import nhom55.hcmuaf.log.RequestInfo;
 import nhom55.hcmuaf.util.MyUtils;
 
 import javax.servlet.RequestDispatcher;
@@ -12,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 
 @WebServlet(name = "reportAKeyPairOfUser", value = "/page/user/report-a-key-pair-of-user")
 public class ReportAKeyPairOfUser extends HttpServlet {
@@ -42,6 +56,57 @@ public class ReportAKeyPairOfUser extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Users user = MyUtils.getLoginedUser(session);
+        Boolean isVerified = (Boolean) session.getAttribute("isAllowedEditedKeyPair");
+        if(!isVerified){
+            doGet(request,response);
+        }else{
+            UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
+            LocalDateTime timeCreated = LocalDateTime.now();
+            RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
 
+            // Viết thêm log khi user report key
+            UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
+            userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
+            PublicKey publicKeyPreValue = userPublicKeyDAO.getPublicKey(userPublicKeyPreValue.getIdPublicKey());
+            userPublicKeyDAO.setStatusUserPublicKey(user.getId(),userPublicKeyPreValue.getIdPublicKey(),PublicKeyStatus.BANNED.name());
+
+
+
+            Log<UserPublicKey> usersPublicKeyLog = new Log<>();
+            usersPublicKeyLog.setIp(requestInfo.getIp());
+            usersPublicKeyLog.setAddress(requestInfo.getAddress());
+            usersPublicKeyLog.setNational(requestInfo.getNation());
+            usersPublicKeyLog.setLevel(LogLevels.WARNING);
+            usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.name());
+            usersPublicKeyLog.setCreateAt(timeCreated);
+            usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyPreValue));
+
+
+//               Viết log public Key bị report
+            Log<PublicKey> publicKeyLog = new Log<>();
+            publicKeyLog.setIp(requestInfo.getIp());
+            publicKeyLog.setAddress(requestInfo.getAddress());
+            publicKeyLog.setNational(requestInfo.getNation());
+            publicKeyLog.setLevel(LogLevels.WARNING);
+            publicKeyLog.setNote(LogNote.BAN_PUBLIC_KEY.name());
+            publicKeyLog.setCreateAt(timeCreated);
+            publicKeyLog.setCurrentValue(MyUtils.convertToJson(publicKeyPreValue));
+
+
+            AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
+            AbsDAO<PublicKey> absPublicKeyDao = new AbsDAO<>();
+            absUserDao.insert(usersPublicKeyLog);
+            absPublicKeyDao.insert(publicKeyLog);
+
+
+            request.setAttribute("isReportKeySuccess", true);
+
+            doGet(request, response);
+
+
+
+        }
     }
 }

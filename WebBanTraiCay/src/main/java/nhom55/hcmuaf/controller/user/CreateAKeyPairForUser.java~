@@ -95,9 +95,7 @@ public class CreateAKeyPairForUser extends HttpServlet {
 
 //               Viết log public Key được tạo
                Log<PublicKey> publicKeyLog = new Log<>();
-               publicKeyLog.setIp(requestInfo.getIp());
-               publicKeyLog.setNational(requestInfo.getNation());
-               publicKeyLog.setAddress(requestInfo.getAddress());
+               publicKeyLog
                publicKeyLog.setLevel(LogLevels.ALERT);
                publicKeyLog.setNote(String.valueOf(LogNote.INSERT_PUBLIC_KEY));
                publicKeyLog.setCurrentValue(MyUtils.convertToJson(publicKeyObj));
