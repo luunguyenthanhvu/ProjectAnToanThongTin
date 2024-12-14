@@ -94,7 +94,7 @@ public class SummaryBillPaypal extends HttpServlet {
         }
         if (billDao.addAListProductToBills(timeNow, productNameList, "Đang giao", users.getId(), 2,
                 firstName, lastName, address, city, phoneNumber, email, subTotalPrice, deliveryFee,
-                note)) {
+                note,"sdasd",false)) {
 
           int id_bills = billDao.getIDAListProductFromBills(timeNow, users.getId());
           for (CartsEntityWebSocket.CartItem itemProduct: cartItem) {

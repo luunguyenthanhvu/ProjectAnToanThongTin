@@ -264,10 +264,10 @@
                         <div class="w-100"></div>
                         <div class="col-md-6" >
                             <div class="form-group">
-                                <label for="hash_for_user">Thông tin đặt hàng người dùng được hash</label>
-                                <input id="hash_for_user" disabled type="text">
+                                <label for="info_hash_for_user">Thông tin đặt hàng người dùng được hash</label>
+                                <input id="info_hash_for_user"  type="text">
                                 <div style="margin-top: 10px">
-                                    <button class="btn btn-primary py-3 px-4" style="margin-right: 40px" type="button">Hash</button>
+                                    <button class="btn btn-primary py-3 px-4" style="margin-right: 40px" type="button" id="buttonHashInfo">Hash</button>
                                     <button class="btn btn-primary py-3 px-4" type="button">Tải file Hash về</button>
                                 </div>
                             </div>
@@ -275,9 +275,9 @@
                         <div class="col-md-6" >
                             <div class="form-group">
                                 <label for="signature_from_user">Chữ ký của người dùng</label>
-                                <input id="signature_from_user" type="text">
+                                <input name="signature" id="signature_from_user" type="text">
                                 <div style="margin-top: 10px">
-                                    <button class="btn btn-primary py-3 px-4"  type="button" style="margin-left: 200px">Verify</button>
+
 
                                 </div>
                             </div>
@@ -303,7 +303,7 @@
                                 <p class="d-flex">
                                     <span>Phí vận chuyển</span>
                                     <span id="delivery_fee"></span>
-                                    <input type="hidden" name="delivery_fee"
+                                    <input  type="hidden" name="delivery_fee"
                                            id="hidden_delivery_fee" value="">
                                 </p>
                                 <hr>
@@ -805,6 +805,7 @@
 <%--Js xử lý lấy dữ liệu vận chuyển--%>
 <script src="${pageContext.request.contextPath}/static/js/web-js/process-delivery-fee.js?v=12"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/hash-info-order.js?v=1423"></script>
 </body>
 <%--Css cho Popup Voucher--%>
 <style>

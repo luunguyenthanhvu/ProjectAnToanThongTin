@@ -1,11 +1,17 @@
 package nhom55.hcmuaf.controller.page.order;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -20,9 +26,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhom55.hcmuaf.beans.Bills;
+import nhom55.hcmuaf.beans.PublicKey;
+import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.beans.Users;
 import nhom55.hcmuaf.dao.BillDao;
 import nhom55.hcmuaf.dao.daoimpl.BillDaoImpl;
+import nhom55.hcmuaf.dao.daoimpl.UserPublicKeyDAOImpl;
+import nhom55.hcmuaf.encrypt.DigitalSignature;
+import nhom55.hcmuaf.encrypt.DigitalSignatureImpl;
+import nhom55.hcmuaf.encrypt.Hash;
+import nhom55.hcmuaf.encrypt.HashImpl;
 import nhom55.hcmuaf.enums.LogLevels;
 import nhom55.hcmuaf.log.AbsDAO;
 import nhom55.hcmuaf.log.Log;
@@ -31,6 +44,7 @@ import nhom55.hcmuaf.sendmail.MailProperties;
 import nhom55.hcmuaf.util.MyUtils;
 import nhom55.hcmuaf.util.OrderValidator;
 import nhom55.hcmuaf.websocket.entities.CartsEntityWebSocket;
+import org.json.simple.JSONObject;
 
 @WebServlet(name = "CheckOut", value = "/page/order/check-out")
 public class CheckOut extends HttpServlet {
@@ -48,8 +62,9 @@ public class CheckOut extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
+    String signatureFromUser = request.getParameter("signature");
     String lastName = request.getParameter("ho_nguoi-dung");
+    System.out.println("Ho nguoi dung: " + lastName );
     String firstName = request.getParameter("ten_nguoi-dung");
     String address = request.getParameter("dia-chi_nguoi-dung");
     String city = request.getParameter("provinceName");
@@ -69,6 +84,7 @@ public class CheckOut extends HttpServlet {
     if (checkValidate(request, response, lastName, firstName, address, city, phoneNumber, email)) {
       HttpSession session = request.getSession();
       Users users = MyUtils.getLoginedUser(session);
+      HashImpl hash =(HashImpl) session.getAttribute("hash");
       double subTotalPrice = 0;
       // get selected Product for buy
       List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
@@ -85,66 +101,97 @@ public class CheckOut extends HttpServlet {
         for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
           productNameList += itemProduct.getProductName() + ", ";
         }
+        // Kiểm tra xem có bất kỳ tên sản phẩm nào không
+        if (productNameList.length() > 0) {
+          // Xóa dấu phẩy và khoảng trắng cuối cùng
+          productNameList = productNameList.substring(0, productNameList.length() - 2);
+        }
         int idPayment = 1;
         address += ", quận " + district + ", tỉnh " + city;
-
-        if (billDao.addAListProductToBills(timeNow, productNameList, "Đang giao", users.getId(),
-            idPayment, firstName, lastName, address, city, phoneNumber, email, subTotalPrice,
-            deliveryFeeDouble, note)) {
-          int id_bills = billDao.getIDAListProductFromBills(timeNow, users.getId());
-          for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
-            if (billDao.addAProductToBillDetails(itemProduct.getId(), id_bills,
-                itemProduct.getQuantity(), itemProduct.getQuantity() * itemProduct.getPrice())) {
-              // billDao.degreeAmountWhenOderingSuccessfully(itemProduct.getId(),itemProduct.getQuantity());
+        //Tạo object order JSON
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("lastName", lastName);
+        jsonObject.put("firstName", firstName);
+        jsonObject.put("address", address);
+        jsonObject.put("city", city);
+        jsonObject.put("district", district);
+        jsonObject.put("phoneNumber", phoneNumber);
+        jsonObject.put("email", email);
+        jsonObject.put("deliveryFee", deliveryFeeDouble);
+        jsonObject.put("note", note);
+        jsonObject.put("subTotalPrice", subTotalPrice);
+        jsonObject.put("productNameList", productNameList);
+        String jsonString = jsonObject.toString();
+        System.out.println("Json 2: " + jsonString);
+        UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
+        UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(users.getId());
+        PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+        String publicKeyString = publicKey.getKey();
+        boolean result = checkSingnatureOfUser(hash,jsonString,signatureFromUser,publicKeyString);
+        if(result){
+          if (billDao.addAListProductToBills(timeNow, productNameList, "Đang giao", users.getId(),
+                  idPayment, firstName, lastName, address, city, phoneNumber, email, subTotalPrice,
+                  deliveryFeeDouble, note,signatureFromUser,false)) {
+            int id_bills = billDao.getIDAListProductFromBills(timeNow, users.getId());
+            for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
+              if (billDao.addAProductToBillDetails(itemProduct.getId(), id_bills,
+                      itemProduct.getQuantity(), itemProduct.getQuantity() * itemProduct.getPrice())) {
+                // billDao.degreeAmountWhenOderingSuccessfully(itemProduct.getId(),itemProduct.getQuantity());
+              }
             }
-          }
 
-          // xoa san pham sau khi dat hang
-          deleteCart(session);
+            // xoa san pham sau khi dat hang
+            deleteCart(session);
 
-          //          Thông báo người mua đã đặt thành công
-          Properties smtpProperties = MailProperties.getSMTPPro();
-          Session session1 = Session.getInstance(smtpProperties, new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-              return new PasswordAuthentication(MailProperties.getEmail(),
-                  MailProperties.getPassword());
-            }
-          });
-          try {
-            Message message = new MimeMessage(session1);
-            message.addHeader("Content-type", "text/HTML; charset= UTF-8");
-            message.setFrom(new InternetAddress(MailProperties.getEmail()));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-            message.setSubject("DAT HANG");
-            message.setText(
-                "Don dat hang cua ban thanh cong. Xem don hang ban vua moi dat tai day : "
-                    + "http://localhost:8080/page/bill/detail?idBills="
-                    + id_bills);
-            Transport.send(message);
-            boolean isOrderSuccessfully = true;
-            Log<Bills> log = new Log<>();
-            AbsDAO<Bills> absDAO = new AbsDAO<>();
-            RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
-            log.setLevel(LogLevels.INFO);
-            log.setIp(requestInfo.getIp());
-            log.setAddress(requestInfo.getAddress());
-            log.setNational(requestInfo.getNation());
-            log.setNote("Người dùng " + users.getUsername() + " vừa đặt hàng thành công");
-            log.setCurrentValue(
-                lastName + " " + firstName + ", địa chỉ: " + address + ", số điện thoại: "
-                    + phoneNumber + ", email: " + email + ", giá tiền đơn hàng: " + subTotalPrice
-                    + ", tiền vận chuyển: " + deliveryFeeDouble + ", ghi chú: " + note
-                    + ", kiểu thanh toán: Thẻ tín dụng " + ", ngày đặt hàng: " + timeNow
-                    + " ,tổng tiền: " + (subTotalPrice + deliveryFeeDouble));
-            log.setCreateAt(timeNow);
-            absDAO.insert(log);
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/page/bill/list-bill");
+            //          Thông báo người mua đã đặt thành công
+            Properties smtpProperties = MailProperties.getSMTPPro();
+            Session session1 = Session.getInstance(smtpProperties, new javax.mail.Authenticator() {
+              protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(MailProperties.getEmail(),
+                        MailProperties.getPassword());
+              }
+            });
+            try {
+              Message message = new MimeMessage(session1);
+              message.addHeader("Content-type", "text/HTML; charset= UTF-8");
+              message.setFrom(new InternetAddress(MailProperties.getEmail()));
+              message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+              message.setSubject("DAT HANG");
+              message.setText(
+                      "Don dat hang cua ban thanh cong. Xem don hang ban vua moi dat tai day : "
+                              + "http://localhost:8080/page/bill/detail?idBills="
+                              + id_bills);
+              Transport.send(message);
+              boolean isOrderSuccessfully = true;
+              Log<Bills> log = new Log<>();
+              AbsDAO<Bills> absDAO = new AbsDAO<>();
+              RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
+              log.setLevel(LogLevels.INFO);
+              log.setIp(requestInfo.getIp());
+              log.setAddress(requestInfo.getAddress());
+              log.setNational(requestInfo.getNation());
+              log.setNote("Người dùng " + users.getUsername() + " vừa đặt hàng thành công");
+              log.setCurrentValue(
+                      lastName + " " + firstName + ", địa chỉ: " + address + ", số điện thoại: "
+                              + phoneNumber + ", email: " + email + ", giá tiền đơn hàng: " + subTotalPrice
+                              + ", tiền vận chuyển: " + deliveryFeeDouble + ", ghi chú: " + note
+                              + ", kiểu thanh toán: Thẻ tín dụng " + ", ngày đặt hàng: " + timeNow
+                              + " ,tổng tiền: " + (subTotalPrice + deliveryFeeDouble));
+              log.setCreateAt(timeNow);
+              absDAO.insert(log);
+              RequestDispatcher dispatcher = request.getRequestDispatcher("/page/bill/list-bill");
 //            request.setAttribute("isOrderSuccessfully",isOrderSuccessfully);
-            dispatcher.forward(request, response);
-          } catch (Exception e) {
-            System.out.println("SendEmail File Error " + e);
+              dispatcher.forward(request, response);
+            } catch (Exception e) {
+              System.out.println("SendEmail File Error " + e);
+            }
           }
+        }else{
+          request.setAttribute("wrongSignature",true);
+          doGet(request, response);
         }
+
+
 
 
       }
@@ -216,5 +263,31 @@ public class CheckOut extends HttpServlet {
         .map(Integer::valueOf)
         .collect(Collectors.toList());
     cart.deleteItems(productIds);
+  }
+  public boolean  checkSingnatureOfUser(HashImpl anotherHash,String jsonOrder, String signature, String publicKeyFromUser) {
+   try{
+     HashImpl hash = anotherHash;
+     System.out.println("JsonOrder: " + jsonOrder);
+     String hashInfo = hash.hashText(jsonOrder);
+     System.out.println("Chuỗi hash lần 1: " + hashInfo);
+     hashInfo= hash.hashText(hashInfo);
+     DigitalSignature digitalSignature = new DigitalSignatureImpl();
+     digitalSignature.loadPublicKey(publicKeyFromUser);
+     String resultHash = digitalSignature.getHashFromSignature(signature);
+     System.out.println("Chuỗi hash lần 2 của user: " + resultHash);
+      return resultHash.equals(hashInfo);
+   } catch (NoSuchAlgorithmException e) {
+       throw new RuntimeException(e);
+   } catch (InvalidKeySpecException e) {
+       throw new RuntimeException(e);
+   } catch (NoSuchPaddingException e) {
+       throw new RuntimeException(e);
+   } catch (IllegalBlockSizeException e) {
+       throw new RuntimeException(e);
+   } catch (BadPaddingException e) {
+       throw new RuntimeException(e);
+   } catch (InvalidKeyException e) {
+       throw new RuntimeException(e);
+   }
   }
 }
