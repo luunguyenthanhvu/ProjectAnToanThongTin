@@ -3,6 +3,7 @@ package nhom55.hcmuaf.dao.daoimpl;
 import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.dao.UserPublicKeyDAO;
 import nhom55.hcmuaf.database.JDBIConnector;
+import nhom55.hcmuaf.enums.PublicKeyStatus;
 
 public class UserPublicKeyDAOImpl implements UserPublicKeyDAO {
 
@@ -28,5 +29,20 @@ public class UserPublicKeyDAOImpl implements UserPublicKeyDAO {
           .one();
     });
 
+  }
+
+  @Override
+  public UserPublicKey userPublicKey(int userId) {
+    // Lấy public key đang được sử dụng (status = 'IN_USE')
+    return JDBIConnector.get().withHandle(handle ->
+        handle.createQuery(
+                "SELECT * FROM user_public_key WHERE idUser = :userId AND status = :status")
+            .bind("userId", userId)
+            .bind("status",
+                PublicKeyStatus.IN_USE.getLevel()) // Sử dụng enum để đảm bảo tính nhất quán
+            .mapToBean(UserPublicKey.class)
+            .findOne() // Tìm một kết quả
+            .orElse(null) // Nếu không có kết quả, trả về null
+    );
   }
 }

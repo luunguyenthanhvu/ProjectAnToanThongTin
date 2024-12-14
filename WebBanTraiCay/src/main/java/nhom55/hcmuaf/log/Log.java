@@ -5,20 +5,31 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import nhom55.hcmuaf.enums.LogLevels;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 @AllArgsConstructor
 
 public class Log<T> {
 
+  @JsonIgnore
   private int id;
+  @JsonIgnore
   private String ip;
+  @JsonIgnore
   private LogLevels level;
+  @JsonIgnore
   private String address;
+  @JsonIgnore
   private String national;
+  @JsonIgnore
   private String note;
+  @JsonIgnore
   private String preValue;
+  @JsonIgnore
   private String currentValue;
+  @JsonIgnore
   private LocalDateTime createAt;
+  @JsonIgnore
   private LocalDateTime updateAt;
 
   public Log() {

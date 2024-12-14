@@ -82,23 +82,18 @@ public class BillService extends AbsDAO {
     var bill = billDao.getABill(dto.getIdBill());
 
     // check if bill has signature
-    if (bill.getSignature() == null) {
+    if (bill.getSignature() == null || bill.getSignature().isEmpty()) {
       // generate default data
       setUpDefaultData(bill, request);
     }
 
+    // Check bill and check key used When sign the bill
+    // Get userPublic key in used
+    UserPublicKey userPublicKey = new UserPublicKey();
+
     // the bill json
     String billJson = MyUtils.convertBillsJson(bill);
     String hashBill = hash.hashText(billJson);
-    System.out.println("thử hash");
-    System.out.println("billl id:" + bill.getId());
-    KeyPair keyPair = asymmetric.generateKeyPair();
-    System.out.println("Private key: " + asymmetric.getPrivateKeyAsString());
-    System.out.println("Public key: " + asymmetric.getPublicKeyAsString());
-    System.out.println("Signature bill " + digitalSignature.createSignature(billJson));
-    System.out.println();
-    System.out.println(hashBill);
-    System.out.println(bill.getSignature());
 
     return MessageResponseDTO.builder().message("Verify Success!").build();
   }
@@ -128,12 +123,13 @@ public class BillService extends AbsDAO {
         .build();
 
     int publicKeyId = publicKeyDAO.insertPublicKey(publicKey);
+    System.out.println("public key sau khi insert: " + publicKey);
     publicKey.setId(publicKeyId);
 
     // after insert write log
     RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
     Log<PublicKey> publicKeyLog = new Log<>();
-    publicKeyLog.setNote(String.valueOf(LogNote.INSERT_PUBLIC_KEY));
+    publicKeyLog.setNote(String.valueOf(LogNote.INSERT_PUBLIC_KEY.getLevel()));
     publicKeyLog.setLevel(LogLevels.INFO);
     publicKeyLog.setPreValue("");
     publicKeyLog.setCurrentValue(MyUtils.convertToJson(publicKey));
@@ -152,9 +148,11 @@ public class BillService extends AbsDAO {
     int userPublicKeyId = userPublicKeyDAO.insertUserPublicKey(userPublicKey);
     userPublicKey.setId(userPublicKeyId);
 
+    System.out.println("user public key sau khi insert");
+
     // after insert write log
     Log<UserPublicKey> userPublicKeyLog = new Log<>();
-    userPublicKeyLog.setNote(String.valueOf(LogNote.USER_CREATE_PUBLIC_KEY));
+    userPublicKeyLog.setNote(String.valueOf(LogNote.USER_CREATE_PUBLIC_KEY.getLevel()));
     userPublicKeyLog.setLevel(LogLevels.INFO);
     userPublicKeyLog.setPreValue("");
     userPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKey));
@@ -166,7 +164,9 @@ public class BillService extends AbsDAO {
     super.insert(userPublicKeyLog);
 
     // update the signature
+    System.out.println("bill sau khi update");
     billDao.updateSignatureABill(bill.getId(), digitalSignature.createSignature(billJson));
+    System.out.println(billDao.getABill(bill.getId()));
   }
 
 }

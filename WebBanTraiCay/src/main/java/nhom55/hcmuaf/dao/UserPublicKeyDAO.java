@@ -10,4 +10,9 @@ public interface UserPublicKeyDAO {
    * Insert new userPublicKey
    */
   int insertUserPublicKey(UserPublicKey userPublicKey);
+
+  /**
+   * Get UserPublicKey IN_USE
+   */
+  UserPublicKey userPublicKey(int userId);
 }
