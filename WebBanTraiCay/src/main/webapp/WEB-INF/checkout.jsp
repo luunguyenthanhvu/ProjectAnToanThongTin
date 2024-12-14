@@ -150,7 +150,6 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-xl-7 ftco-animate">
-
                     <h3 class="mb-4 billing-heading">Chi tiết thanh toán</h3>
                     <div class="row align-items-end">
                         <div class="col-md-6">
@@ -255,11 +254,35 @@
                                       </textarea>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="position: relative; top: -100px">
+                            <span>Nếu bạn chưa có tool ký số của web chúng tôi có thể tải</span>
+                            <a href="#">Tại đây</a>
                             <div class="form-group">
 
                             </div>
                         </div>
+                        <div class="w-100"></div>
+                        <div class="col-md-6" >
+                            <div class="form-group">
+                                <label for="info_hash_for_user">Thông tin đặt hàng người dùng được hash</label>
+                                <input id="info_hash_for_user"  type="text">
+                                <div style="margin-top: 10px">
+                                    <button class="btn btn-primary py-3 px-4" style="margin-right: 40px" type="button" id="buttonHashInfo">Hash</button>
+                                    <button class="btn btn-primary py-3 px-4" type="button">Tải file Hash về</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6" >
+                            <div class="form-group">
+                                <label for="signature_from_user">Chữ ký của người dùng</label>
+                                <input name="signature" id="signature_from_user" type="text">
+                                <div style="margin-top: 10px">
+
+
+                                </div>
+                            </div>
+                        </div>
+
 
                     </div>
 
@@ -280,7 +303,7 @@
                                 <p class="d-flex">
                                     <span>Phí vận chuyển</span>
                                     <span id="delivery_fee"></span>
-                                    <input type="hidden" name="delivery_fee"
+                                    <input  type="hidden" name="delivery_fee"
                                            id="hidden_delivery_fee" value="">
                                 </p>
                                 <hr>
@@ -563,17 +586,30 @@
   }
 
   function validateAddress() {
-    var text = diaChi.value;
-    var error = document.getElementById("address_error");
-    if (text.length == 0 || text == null) {
-      error.textContent = "Vui lòng nhập dữ liệu";
-      error.style.display = "block";
-      return false;
-    } else {
+      var kyTuHopLe =/\b(\S.+?)\b\s+\1\b/gi;
+      var text = diaChi.value; // Lấy giá trị từ input
+      var error = document.getElementById("address_error");
+
+      // Kiểm tra nếu chuỗi trống
+      if (text.length == 0 || text == null) {
+          error.textContent = "Vui lòng nhập dữ liệu";
+          error.style.display = "block";
+          return false;
+      }
+
+      // Kiểm tra tính hợp lệ của chuỗi
+      if (kyTuHopLe.test(text)) {
+          error.textContent = "Địa chỉ bạn nhập không hợp lệ. Vui lòng nhập lại";
+          error.style.display = "block";
+          return false;
+      }
+
+      // Nếu hợp lệ
       error.style.display = "none";
       return true;
-    }
   }
+
+
 
   function validateSDT() {
     var text = sdt.value;
@@ -769,6 +805,7 @@
 <%--Js xử lý lấy dữ liệu vận chuyển--%>
 <script src="${pageContext.request.contextPath}/static/js/web-js/process-delivery-fee.js?v=12"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/hash-info-order.js?v=1423"></script>
 </body>
 <%--Css cho Popup Voucher--%>
 <style>

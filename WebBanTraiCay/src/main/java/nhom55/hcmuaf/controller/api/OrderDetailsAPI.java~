@@ -7,6 +7,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+<<<<<<< HEAD
+import nhom55.hcmuaf.dto.request.VerifyBillRequestDTO;
+=======
+>>>>>>> vu-branch/admin-checkout
 import nhom55.hcmuaf.dto.response.MessageResponseDTO;
 import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.services.BillService;
@@ -17,7 +21,10 @@ import nhom55.hcmuaf.util.MyUtils;
 public class OrderDetailsAPI extends HttpServlet {
 
   private ProductService productService;
+<<<<<<< HEAD
+=======
   private BillService billService;
+>>>>>>> vu-branch/admin-checkout
   private final String REQUEST_BODY = "request-body";
 
   @Override
@@ -64,10 +71,24 @@ public class OrderDetailsAPI extends HttpServlet {
     try {
       String context = request.getPathInfo();
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
+<<<<<<< HEAD
+      productService = new ProductService();
+      productService.begin();
+      switch (context) {
+        case "/check-signature":
+          VerifyBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
+              VerifyBillRequestDTO.class);
+          System.out.println("DTO id nè");
+          System.out.println(dto);
+          out.println(MyUtils.convertToJson(
+              MessageResponseDTO.builder().message("Verify success!")));
+          out.flush();
+=======
       switch (context) {
         case "/check-signature":
           MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO);
           out.println(MyUtils.convertToJson(message));
+>>>>>>> vu-branch/admin-checkout
           break;
       }
 
@@ -76,9 +97,14 @@ public class OrderDetailsAPI extends HttpServlet {
       e.printStackTrace();
       throw new MyHandleException("Loi server", 500);
     } finally {
+<<<<<<< HEAD
+
+      out.flush();
+=======
       System.out.println("flush và flush buffer");
       out.flush();
       response.flushBuffer();
+>>>>>>> vu-branch/admin-checkout
     }
   }
 }

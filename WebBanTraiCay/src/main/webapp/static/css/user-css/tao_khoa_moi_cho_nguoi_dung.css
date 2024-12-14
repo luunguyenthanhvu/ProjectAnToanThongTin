@@ -1,0 +1,69 @@
+.main-user-content{
+    min-height: 100%;
+    position: relative;
+}
+.rootContainer{
+    position: absolute; /* Sử dụng tuyệt đối để định vị */
+    top: 45%; /* Đẩy xuống giữa theo chiều dọc */
+    left: 50%; /* Đẩy sang giữa theo chiều ngang */
+    transform: translate(-50%, -50%); /* Dịch chuyển để căn giữa */
+    background-color: white;
+    text-align: center;
+}
+.containerCreateKey {
+    border: 2px solid black;
+    width: 1000px;
+    padding: 20px;
+    background-color: white;
+    text-align: center;
+    position: relative;
+}
+
+.back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    border: 1px solid black;
+    background: white;
+    cursor: pointer;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.form-group {
+    margin: 15px 0;
+    text-align: left;
+}
+
+label {
+    display: inline-block;
+    width: 100px;
+    font-weight: bold;
+}
+
+input {
+    width: calc(100% - 110px);
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
+.button-group {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: 1px solid black;
+    background: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #82ae46;
+}

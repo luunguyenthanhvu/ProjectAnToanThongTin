@@ -11,7 +11,7 @@ public interface BillDao {
   public boolean addAListProductToBills(LocalDateTime orderedDate, String productList,
       String status, int user, int payment, String firstName, String lastName, String streetAddress,
       String city, String phoneNumber, String email, double totalPrice, double deliveryFee,
-      String note,String signature, boolean isVerify);
+      String note);
 
   public int getIDAListProductFromBills(LocalDateTime orderedDate, int idUser);
 

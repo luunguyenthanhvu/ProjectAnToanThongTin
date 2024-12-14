@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpSession;
+import nhom55.hcmuaf.beans.Bills;
 import nhom55.hcmuaf.beans.Users;
 import nhom55.hcmuaf.websocket.entities.CartsEntityWebSocket;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -152,7 +153,27 @@ public class MyUtils {
     return userHashSession.get(id);
   }
 
-  public static void main(String[] args) throws IOException {
-    System.out.println(convertToJson(new Users()));
+  /**
+   * This method use for hash bill to verify signature
+   * @param bills
+   * @return hash bill
+   */
+  public static String convertBillsJson(Bills bills) {
+    return convertToJson(Bills
+        .builder()
+        .orderedDate(bills.getOrderedDate())
+        .productList(bills.getProductList())
+        .userId(bills.getUserId())
+        .payment(bills.getPayment())
+        .firstName(bills.getFirstName())
+        .lastName(bills.getLastName())
+        .streetAddress(bills.getStreetAddress())
+        .city(bills.getCity())
+        .phoneNumber(bills.getPhoneNumber())
+        .deliveryFee(bills.getDeliveryFee())
+        .email(bills.getEmail())
+        .totalPrice(bills.getTotalPrice())
+        .note(bills.getNote())
+        .build());
   }
 }
