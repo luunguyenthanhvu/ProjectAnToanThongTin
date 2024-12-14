@@ -29,14 +29,11 @@ public class GeneralKeyOfUser extends HttpServlet {
         HttpSession session = req.getSession();
         Users user = MyUtils.getLoginedUser(session);
         UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
-         if(userPublicKeyDAO.getUserPublicKey(user.getId()) != null){
-             UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(user.getId());
-             if(userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey()) != null){
-                 PublicKey publicKey =  userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
-                 req.setAttribute("publicKey", publicKey);
-             }
-         }
-
+        UserPublicKey userPublicKey =  userPublicKeyDAO.getUserPublicKey(user.getId());
+        if(userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey()) != null){
+            PublicKey publicKey =  userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+            req.setAttribute("publicKey", publicKey);
+        }
         req.setAttribute("user", user);
         RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/WEB-INF/user/thong-tin-ve-khoa.jsp");
         dispatcher.forward(req, resp);

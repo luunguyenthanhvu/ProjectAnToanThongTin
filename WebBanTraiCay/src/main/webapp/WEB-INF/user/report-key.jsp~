@@ -152,7 +152,7 @@
     <% if (isReportKeySuccess != null && isReportKeySuccess) { %>
     Swal.fire({
         title: 'Thành công!',
-        text: 'Report key đã thành công. Người dùng vui lòng tạo khóa mới để có thể tiếp tục thanh toán !',
+        text: 'Report key đã được tạo thành công.',
         icon: 'success',
         confirmButtonText: 'OK'
     }).then((result) => {

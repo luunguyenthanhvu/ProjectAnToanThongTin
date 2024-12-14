@@ -255,7 +255,6 @@
     confirmButtonText: 'OK'
   });
   <%} %>
-  <% notifyCreateKeyPair = "false";%>
 </script>
 </body>
 </html>

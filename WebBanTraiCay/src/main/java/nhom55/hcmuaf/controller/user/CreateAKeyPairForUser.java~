@@ -1,12 +1,32 @@
 package nhom55.hcmuaf.controller.user;
 
+import nhom55.hcmuaf.beans.PublicKey;
+import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.beans.Users;
+import nhom55.hcmuaf.dao.UserPublicKeyDAO;
+import nhom55.hcmuaf.dao.daoimpl.PublicKeyDAOImpl;
+import nhom55.hcmuaf.dao.daoimpl.UserPublicKeyDAOImpl;
+import nhom55.hcmuaf.encrypt.Asymmetric;
+import nhom55.hcmuaf.encrypt.AsymmetricImpl;
+import nhom55.hcmuaf.enums.LogLevels;
+import nhom55.hcmuaf.enums.LogNote;
+import nhom55.hcmuaf.enums.PublicKeyStatus;
+import nhom55.hcmuaf.log.AbsDAO;
+import nhom55.hcmuaf.log.Log;
+import nhom55.hcmuaf.log.RequestInfo;
+import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.util.MyUtils;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.servlet.annotation.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 
 @WebServlet(name = "createAKeyPairForUser", value = "/page/user/create-a-key-pair-for-user")
 public class CreateAKeyPairForUser extends HttpServlet {
@@ -38,6 +58,65 @@ public class CreateAKeyPairForUser extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       try{
+           HttpSession session = request.getSession();
+           Users user = MyUtils.getLoginedUser(session);
+           Boolean isVerified = (Boolean) session.getAttribute("isAllowedEditedKeyPair");
+           if(!isVerified){
+               doGet(request,response);
+           }else{
+               Asymmetric asymmetric = new AsymmetricImpl();
+               asymmetric.loadKeyPair(asymmetric.generateKeyPair());
+               String publicKey = asymmetric.getPublicKeyAsString();
+               String privateKey = asymmetric.getPrivateKeyAsString();
+               UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
+               LocalDateTime timeCreated = LocalDateTime.now();
+               userPublicKeyDAO.insertPublicKey(publicKey, timeCreated);
+               int idPublicKey = userPublicKeyDAO.getIdPublicKey(timeCreated);
+               userPublicKeyDAO.insertUserPublicKey(user.getId(), idPublicKey, PublicKeyStatus.IN_USE);
+               // Viết thêm log khi user tao key
+               RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
+              PublicKey publicKeyObj = new PublicKey();
+              publicKeyObj.setKey(publicKey);
+              publicKeyObj.setCreateAt(timeCreated);
+               UserPublicKey userPublicKeyObj = new UserPublicKey();
+               userPublicKeyObj.setIdUser(user.getId());
+               userPublicKeyObj.setIdPublicKey(idPublicKey);
+               userPublicKeyObj.setStatus(PublicKeyStatus.IN_USE);
 
+               Log<UserPublicKey> usersPublicKeyLog = new Log<>();
+               usersPublicKeyLog.setIp(requestInfo.getIp());
+               usersPublicKeyLog.setNational(requestInfo.getNation());
+               usersPublicKeyLog.setAddress(requestInfo.getAddress());
+               usersPublicKeyLog.setLevel(LogLevels.ALERT);
+               usersPublicKeyLog.setNote(String.valueOf(LogNote.USER_CREATE_PUBLIC_KEY));
+               usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyObj));
+               usersPublicKeyLog.setCreateAt(timeCreated);
+
+//               Viết log public Key được tạo
+               Log<PublicKey> publicKeyLog = new Log<>();
+               publicKeyLog
+               publicKeyLog.setLevel(LogLevels.ALERT);
+               publicKeyLog.setNote(String.valueOf(LogNote.INSERT_PUBLIC_KEY));
+               publicKeyLog.setCurrentValue(MyUtils.convertToJson(publicKeyObj));
+               publicKeyLog.setCreateAt(timeCreated);
+
+               AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
+               AbsDAO<PublicKey> absPublicKeyDao = new AbsDAO<>();
+               absUserDao.insert(usersPublicKeyLog);
+               absPublicKeyDao.insert(publicKeyLog);
+
+               request.setAttribute("publicKey", publicKey);
+               request.setAttribute("privateKey", privateKey);
+               request.setAttribute("isCreateKeySuccess", true);
+
+               doGet(request, response);
+
+
+
+           }
+       } catch (NoSuchAlgorithmException e) {
+           throw new RuntimeException(e);
+       }
     }
 }
