@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -71,6 +72,9 @@ public class CreateAKeyPairForUser extends HttpServlet {
                asymmetric.loadKeyPair(asymmetric.generateKeyPair());
                String publicKey = asymmetric.getPublicKeyAsString();
                String privateKey = asymmetric.getPrivateKeyAsString();
+               // truy cap session theo user hien tai
+               // viet string private key vao trong session voi key = privateKey_{userId}
+               session.setAttribute("privateKey_" + user.getId(), privateKey);
                UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
                if(userPublicKeyDAO.getUserPublicKey(user.getId()) != null){
 //                   // Ghi log cho public key bị ban
@@ -89,9 +93,9 @@ public class CreateAKeyPairForUser extends HttpServlet {
 
                }
 
-
-               userPublicKeyDAO.insertPublicKey(publicKey, timeCreated);
-               int idPublicKey = userPublicKeyDAO.getIdPublicKey(timeCreated);
+               LocalDateTime timeCreated1 = LocalDateTime.now();
+               userPublicKeyDAO.insertPublicKey(publicKey, timeCreated1);
+               int idPublicKey = userPublicKeyDAO.getIdPublicKey(timeCreated1);
                userPublicKeyDAO.insertUserPublicKey(user.getId(), idPublicKey, PublicKeyStatus.IN_USE);
                // Viết thêm log khi user tao key
 
@@ -108,7 +112,7 @@ public class CreateAKeyPairForUser extends HttpServlet {
                usersPublicKeyLog.setLevel(LogLevels.ALERT);
                usersPublicKeyLog.setNote(String.valueOf(LogNote.USER_CREATE_PUBLIC_KEY.getLevel()));
                usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyObj));
-               usersPublicKeyLog.setCreateAt(timeCreated);
+               usersPublicKeyLog.setCreateAt(timeCreated1);
 
 //
 
@@ -117,7 +121,6 @@ public class CreateAKeyPairForUser extends HttpServlet {
 
 
                request.setAttribute("publicKey", publicKey);
-               request.setAttribute("privateKey", privateKey);
                request.setAttribute("isCreateKeySuccess", true);
 
                doGet(request, response);

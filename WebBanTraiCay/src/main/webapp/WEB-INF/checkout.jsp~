@@ -303,7 +303,7 @@
                                 <p class="d-flex">
                                     <span>Phí vận chuyển</span>
                                     <span id="delivery_fee"></span>
-                                    <input  type="hidden" name="delivery_fee"
+                                    <input type="hidden" name="delivery_fee"
                                            id="hidden_delivery_fee" value="">
                                 </p>
                                 <hr>

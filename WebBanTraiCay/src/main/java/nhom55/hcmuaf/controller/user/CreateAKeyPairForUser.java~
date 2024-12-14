@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -71,11 +72,14 @@ public class CreateAKeyPairForUser extends HttpServlet {
                asymmetric.loadKeyPair(asymmetric.generateKeyPair());
                String publicKey = asymmetric.getPublicKeyAsString();
                String privateKey = asymmetric.getPrivateKeyAsString();
+               // truy cap session theo user hien tai
+               // viet string private key vao trong session voi key = privateKey_{userId}
+               session.setAttribute("privateKey_" + user.getId(), privateKey);
                UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
                if(userPublicKeyDAO.getUserPublicKey(user.getId()) != null){
 //                   // Ghi log cho public key bị ban
                    UserPublicKey userPublicKeyReadyToBan = userPublicKeyDAO.getUserPublicKey(user.getId());
-                   userPublicKeyDAO.setStatusUserPublicKey(user.getId(),userPublicKeyReadyToBan.getIdPublicKey(),PublicKeyStatus.BANNED.name());
+                   userPublicKeyReadyToBan.setStatus(PublicKeyStatus.BANNED);
                    Log<UserPublicKey> usersPublicKeyLog = new Log<>();
                    usersPublicKeyLog.setIp(requestInfo.getIp());
                    usersPublicKeyLog.setNational(requestInfo.getNation());
@@ -117,7 +121,6 @@ public class CreateAKeyPairForUser extends HttpServlet {
 
 
                request.setAttribute("publicKey", publicKey);
-               request.setAttribute("privateKey", privateKey);
                request.setAttribute("isCreateKeySuccess", true);
 
                doGet(request, response);

@@ -109,10 +109,6 @@
           <label for="public-key">Public key:</label>
           <input type="text" id="public-key"  value="<%= publicKey != null ? publicKey : "" %>" readonly>
         </div>
-        <div class="form-group">
-          <label for="private-key">Private key:</label>
-          <input type="text" id="private-key" value="<%= privateKey != null ? privateKey : "" %>" readonly>
-        </div>
         <div class="button-group">
           <button class="generate-btn">Tạo mới</button>
           <button type="button" class="save-btn">Lưu key về máy</button>

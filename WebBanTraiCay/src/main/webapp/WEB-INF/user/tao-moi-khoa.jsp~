@@ -111,7 +111,7 @@
         </div>
         <div class="form-group">
           <label for="private-key">Private key:</label>
-          <input type="text" id="private-key">
+          <input type="text" id="private-key" value="<%= privateKey != null ? privateKey : "" %>" readonly>
         </div>
         <div class="button-group">
           <button class="generate-btn">Tạo mới</button>

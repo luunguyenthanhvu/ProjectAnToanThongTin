@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-@WebServlet(name = "HashInfoOrder", value = "/page/order/hash-info-order")
+@WebServlet(name = "HashInfoOrder", value = "/HashInfoOrder")
 public class HashInfoOrder extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
