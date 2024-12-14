@@ -258,9 +258,9 @@ public class SignatureScreen_Controller extends AController<SignatureScreen_View
                 "current_algorithm", model.getAvailableAlgorithm().get(1),
                 "current_using_key", PrivateKey.class
         ));
-        model.setCurrentMode(SignatureScreen_Model.INPUT_FILE);
+        model.setCurrentMode(SignatureScreen_Model.INPUT_TEXT);
         model.notifyObservers("change_input_mode", Map.of(
-                "current_input_mode", SignatureScreen_Model.INPUT_FILE
+                "current_input_mode", SignatureScreen_Model.INPUT_TEXT
         ));
     }
 
