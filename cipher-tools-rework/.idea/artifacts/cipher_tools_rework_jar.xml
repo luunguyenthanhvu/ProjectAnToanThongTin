@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="cipher-tools-rework:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts</output-path>
+    <root id="archive" name="cipher-tools-rework.jar">
+      <element id="module-output" name="cipher-tools-rework" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/flatlaf-3.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/out/artifacts/myapp_jar/myapp.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
