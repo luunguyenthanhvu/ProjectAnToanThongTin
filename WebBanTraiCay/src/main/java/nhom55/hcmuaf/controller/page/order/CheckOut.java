@@ -65,6 +65,7 @@ public class CheckOut extends HttpServlet {
     System.out.println("Ho nguoi dung: " + lastName);
     String firstName = request.getParameter("ten_nguoi-dung");
     String address = request.getParameter("dia-chi_nguoi-dung");
+    String address1 = request.getParameter("dia-chi_nguoi-dung");
     String city = request.getParameter("provinceName");
     String district = request.getParameter("districtName");
     String phoneNumber = request.getParameter("sdt_nguoi-dung");
@@ -142,7 +143,7 @@ public class CheckOut extends HttpServlet {
         UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(users.getId());
         PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
         String publicKeyString = publicKey.getKey();
-        boolean result = checkSingnatureOfUser(hash, jsonString, signatureFromUser,
+        boolean result = checkSingnatureOfUser(request,hash, jsonString, signatureFromUser,
             publicKeyString);
         if (result) {
           if (billDao.addAListProductToBills(timeNow, productNameList, "Đang chuẩn bị",
@@ -204,8 +205,14 @@ public class CheckOut extends HttpServlet {
             }
           }
         } else {
-          request.setAttribute("wrongSignature", true);
-          doGet(request, response);
+          request.setAttribute("firstName", firstName);
+          request.setAttribute("lastName", lastName);
+          request.setAttribute("address", address1);
+          request.setAttribute("phone", phoneNumber);
+          request.setAttribute("email", email);
+          request.setAttribute("noteFromUser", note);
+          RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/checkout.jsp");
+          dispatcher.forward(request, response);
         }
 
 
@@ -262,7 +269,7 @@ public class CheckOut extends HttpServlet {
       count++;
       request.setAttribute("emailError", checkEmail);
     } else {
-      request.setAttribute("email", city);
+      request.setAttribute("email", email);
     }
     if (count > 0) {
       return false;
@@ -280,7 +287,7 @@ public class CheckOut extends HttpServlet {
     cart.deleteItems(productIds);
   }
 
-  public boolean checkSingnatureOfUser(HashImpl anotherHash, String jsonOrder, String signature,
+  public boolean checkSingnatureOfUser(HttpServletRequest request,HashImpl anotherHash, String jsonOrder, String signature,
       String publicKeyFromUser) {
     try {
       HashImpl hash = anotherHash;
@@ -296,19 +303,13 @@ public class CheckOut extends HttpServlet {
       System.out.println("Kết quả: mã hóa : " + resultHash + "\n"
           + "Ket qua hash 2: " + hashInfo);
       System.out.println("2 thang nay bang nhau" + resultHash.equals(hashInfo));
+      request.setAttribute("wrongSignature", true);
       return resultHash.equals(hashInfo);
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    } catch (InvalidKeySpecException e) {
-      throw new RuntimeException(e);
-    } catch (NoSuchPaddingException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalBlockSizeException e) {
-      throw new RuntimeException(e);
-    } catch (BadPaddingException e) {
-      throw new RuntimeException(e);
-    } catch (InvalidKeyException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      System.err.println("Error occurred: " + e.getMessage());
+      e.printStackTrace();
+      request.setAttribute("errorProcessSignature", true);
+      return false;
     }
   }
 }

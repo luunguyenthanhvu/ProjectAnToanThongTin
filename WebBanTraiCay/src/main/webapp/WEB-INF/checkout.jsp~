@@ -55,7 +55,7 @@
 <%
     // Lấy giá trị attribute wrongSignature từ /page/order/check-out
     Boolean wrongSignature = (Boolean) request.getAttribute("wrongSignature");
-    Boolean errorProcessSignature = (Boolean) request.getAttribute("errorProcessSignature");
+    
 %>
 <nav class="navbar-container navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light"
      id="ftco-navbar">
@@ -858,15 +858,7 @@
         confirmButtonText: 'OK'
     });
     <% }  %>
-  //Kiểm tra chữ ký có hợp lệ ko
-  <% if (errorProcessSignature != null && errorProcessSignature) { %>
-  Swal.fire({
-      title: 'Thông báo!',
-      text: 'Chữ ký không hợp lệ. Vui lòng kiểm tra lại chữ ký !',
-      icon: 'info',
-      confirmButtonText: 'OK'
-  });
-  <% }  %>
+
 </script>
 </body>
 <%--Css cho Popup Voucher--%>

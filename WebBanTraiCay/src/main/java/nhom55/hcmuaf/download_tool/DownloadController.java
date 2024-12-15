@@ -60,7 +60,6 @@ public class DownloadController extends HttpServlet {
     public void doDownloadTool(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Đường dẫn tới file
         File file = new File("C:\\Users\\Yukihira Souma\\Desktop\\Project_Cuoi_Ky_ATBM\\ProjectAnToanThongTin\\TemplateProject\\cipher-tool.exe");
-
         if (!file.exists()) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -82,5 +81,10 @@ public class DownloadController extends HttpServlet {
                 outputStream.write(buffer, 0, bytesRead);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        String path = DownloadController.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        System.out.println("File đang chạy từ: " + path);
     }
 }
