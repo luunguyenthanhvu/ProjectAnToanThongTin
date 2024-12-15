@@ -3,12 +3,20 @@ package nhom55.hcmuaf.services;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Properties;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import nhom55.hcmuaf.beans.Bills;
 import nhom55.hcmuaf.beans.PublicKey;
 import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.dao.BillDao;
@@ -29,6 +37,7 @@ import nhom55.hcmuaf.encrypt.Hash;
 import nhom55.hcmuaf.encrypt.HashImpl;
 import nhom55.hcmuaf.log.AbsDAO;
 import nhom55.hcmuaf.my_handle_exception.MyHandleException;
+import nhom55.hcmuaf.sendmail.MailProperties;
 import nhom55.hcmuaf.util.MyUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -107,6 +116,7 @@ public class BillService extends AbsDAO {
       if (hash2.equals(decryptedSignatureHash)) {
         return MessageResponseDTO.builder().message("Verify Success!").build();
       } else {
+        updateBillWrongSignature(bill);
         throw new MyHandleException("Signature mismatch with the current public key", 500);
       }
     } catch (BadPaddingException e) {
@@ -122,15 +132,44 @@ public class BillService extends AbsDAO {
 
         // If the decrypted signature matches with the previous public key, verify successfully
         if (hash2.equals(decryptedSignatureHash)) {
-          return MessageResponseDTO.builder().message("Verify Success with previous public key!")
+          return MessageResponseDTO.builder().message("Verify Success!")
               .build();
         } else {
+          updateBillWrongSignature(bill);
           throw new MyHandleException("Invalid signature: Bill is not valid", 500);
         }
       } catch (BadPaddingException ex) {
         // If both public keys fail, throw exception
+        updateBillWrongSignature(bill);
         throw new MyHandleException("Unable to verify signature with any public key", 500);
       }
+    }
+  }
+
+  private void updateBillWrongSignature(Bills bills) {
+    // if signature wrong send email + update status
+    BillDao billDao = new BillDaoImpl();
+    billDao.updateStatusABill(bills.getId(), "Đã hủy");
+
+    Properties properties = MailProperties.getSMTPPro();
+    Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+      protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication(MailProperties.getEmail(), MailProperties.getPassword());
+      }
+    });
+
+    // send email
+    try {
+      Message message = new MimeMessage(session);
+      message.addHeader("Content-type", "text/HTML; charset= UTF-8");
+      message.setFrom(new InternetAddress(MailProperties.getEmail()));
+      message.addRecipient(Message.RecipientType.TO, new InternetAddress(bills.getEmail()));
+      message.setSubject("Đơn hàng bị hủy");
+      message.setText(
+          "Vì chính sách bảo mật của công ty. Chúng tôi sẽ hủy đơn hàng của bạn. 🐧🐧🐧🐧🐧");
+      Transport.send(message);
+    } catch (Exception e) {
+      System.out.println("SendEmail File Error " + e);
     }
   }
 

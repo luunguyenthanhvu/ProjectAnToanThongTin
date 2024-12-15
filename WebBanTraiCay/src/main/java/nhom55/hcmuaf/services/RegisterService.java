@@ -1,6 +1,5 @@
 package nhom55.hcmuaf.services;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Properties;
@@ -21,7 +20,6 @@ import nhom55.hcmuaf.log.AbsDAO;
 import nhom55.hcmuaf.log.Log;
 import nhom55.hcmuaf.log.RequestInfo;
 import nhom55.hcmuaf.sendmail.MailProperties;
-import nhom55.hcmuaf.util.MyUtils;
 
 public class RegisterService extends AbsDAO {
 
@@ -69,7 +67,7 @@ public class RegisterService extends AbsDAO {
         log.setLevel(LogLevels.INFO);
         log.setPreValue("");
 
-          log.setCurrentValue(newUser.toString());
+        log.setCurrentValue(newUser.toString());
 
         log.setCreateAt(LocalDateTime.now());
         log.setUpdateAt(null);
@@ -115,13 +113,14 @@ public class RegisterService extends AbsDAO {
       System.out.println("SendEmail File Error " + e);
     }
   }
-  public void createCouponForUser(int idUser){
-     String title1 ="GIẢM 30K";
-     String title2 ="GIẢM 20%";
-     double price1 = 300000;
-     double price2 =0.2;
-     String content1 ="Người dùng thanh toán lần đầu sẽ được giảm 30k cho 1 đơn hàng";
-     String content2 = "Đơn thanh toán trên 200k sẽ được giảm 20%";
+
+  public void createCouponForUser(int idUser) {
+    String title1 = "GIẢM 30K";
+    String title2 = "GIẢM 20%";
+    double price1 = 300000;
+    double price2 = 0.2;
+    String content1 = "Người dùng thanh toán lần đầu sẽ được giảm 30k cho 1 đơn hàng";
+    String content2 = "Đơn thanh toán trên 200k sẽ được giảm 20%";
     LocalDate beginDate = LocalDate.now();
     LocalDate endDate = beginDate.plusDays(30);
     VoucherDAOImpl voucherDAO = new VoucherDAOImpl();
