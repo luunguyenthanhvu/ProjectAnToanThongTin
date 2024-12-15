@@ -138,7 +138,7 @@ public class SignatureScreen_Controller extends AController<SignatureScreen_View
         String filePath = file.getAbsolutePath();
         if (filePath.contains(".")) {
             String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1);
-            if (!fileExtension.equals("txt") && !fileExtension.equals("txt")) {
+            if (!fileExtension.equals("txt") && !fileExtension.equals("pem")) {
                 // Quăng lỗi nếu đuôi file không phải .txt
                 throw new MyAppException(ErrorType.WRONG_FILE_FORMAT_LOAD_KEY, view);
             }
