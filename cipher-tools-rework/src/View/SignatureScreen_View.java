@@ -130,33 +130,11 @@ public class SignatureScreen_View extends AScreenView implements ScreenObserver 
 
         gbc.gridy = 0; {
             gbc.gridx = 0;
-            gbc.weightx = 0;
-            gbc.anchor = GridBagConstraints.WEST;
-            gbc.fill = GridBagConstraints.NONE;
-            AlgorithmSettingsPanel.add(new JLabel("Input type:"), gbc);
-
-            gbc.gridx = 1;
-            gbc.gridwidth = GridBagConstraints.REMAINDER;
-            JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT)); {
-                ButtonGroup group = new ButtonGroup(); {
-                    group.add(ChooseInputType_RadioButtons[0]);
-                    group.add(ChooseInputType_RadioButtons[1]);
-                }
-                wrapper.add(ChooseInputType_RadioButtons[0]);
-                wrapper.add(ChooseInputType_RadioButtons[1]);
-            }
-            AlgorithmSettingsPanel.add(wrapper, gbc);
-        }
-
-        gbc.gridy = 1; {
-            gbc.gridx = 0;
-            gbc.weightx = 0;
             gbc.anchor = GridBagConstraints.NORTHWEST;
-            gbc.fill = GridBagConstraints.NONE;
+            gbc.gridwidth = 1;
             AlgorithmSettingsPanel.add(new JLabel("Input:"), gbc);
 
             gbc.gridx = 1;
-            gbc.weightx = 0;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridwidth = GridBagConstraints.REMAINDER;
             JScrollPane scrollPane = new JScrollPane(InputText_TextArea); {
@@ -181,16 +159,15 @@ public class SignatureScreen_View extends AScreenView implements ScreenObserver 
             AlgorithmSettingsPanel.add(PanelFileWrapper, gbc);
         }
 
-        gbc.gridy = 3; {
+        gbc.gridy = 1; {
             gbc.gridx = 0;
-            gbc.weightx = 0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.anchor = GridBagConstraints.NORTHWEST;
-            gbc.fill = GridBagConstraints.NONE;
+            gbc.gridwidth = 1;
             AlgorithmSettingsPanel.add(new JLabel("Private key:"), gbc);
 
             gbc.gridx = 1;
             gbc.gridwidth = GridBagConstraints.REMAINDER; // Chiếm hết cột còn lại
-            gbc.weightx = 1;
             gbc.fill = GridBagConstraints.HORIZONTAL;
 
             JPanel wrapper = new JPanel(new BorderLayout()); {
