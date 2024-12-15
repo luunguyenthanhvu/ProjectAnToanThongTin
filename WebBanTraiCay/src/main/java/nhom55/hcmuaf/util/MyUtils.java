@@ -1,6 +1,5 @@
 package nhom55.hcmuaf.util;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +10,7 @@ import nhom55.hcmuaf.websocket.entities.CartsEntityWebSocket;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.json.simple.JSONObject;
 
 public class MyUtils {
 
@@ -155,25 +155,38 @@ public class MyUtils {
 
   /**
    * This method use for hash bill to verify signature
+   *
    * @param bills
    * @return hash bill
    */
   public static String convertBillsJson(Bills bills) {
-    return convertToJson(Bills
-        .builder()
-        .orderedDate(bills.getOrderedDate())
-        .productList(bills.getProductList())
-        .userId(bills.getUserId())
-        .payment(bills.getPayment())
-        .firstName(bills.getFirstName())
-        .lastName(bills.getLastName())
-        .streetAddress(bills.getStreetAddress())
-        .city(bills.getCity())
-        .phoneNumber(bills.getPhoneNumber())
-        .deliveryFee(bills.getDeliveryFee())
-        .email(bills.getEmail())
-        .totalPrice(bills.getTotalPrice())
-        .note(bills.getNote())
-        .build());
+//    return convertToJson(Bills
+//        .builder()
+//        .orderedDate(bills.getOrderedDate())
+//        .productList(bills.getProductList())
+//        .userId(bills.getUserId())
+//        .firstName(bills.getFirstName())
+//        .lastName(bills.getLastName())
+//        .streetAddress(bills.getStreetAddress())
+//        .city(bills.getCity())
+//        .phoneNumber(bills.getPhoneNumber())
+//        .deliveryFee(bills.getDeliveryFee())
+//        .email(bills.getEmail())
+//        .totalPrice(bills.getTotalPrice())
+//        .note(bills.getNote())
+//        .build());
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("lastName", bills.getLastName());
+    jsonObject.put("firstName", bills.getFirstName());
+    jsonObject.put("address", bills.getAddress());
+    jsonObject.put("city", bills.getCity());
+    jsonObject.put("orderDate", bills.getOrderedDate());
+    jsonObject.put("phoneNumber", bills.getPhoneNumber());
+    jsonObject.put("email", bills.getEmail());
+    jsonObject.put("deliveryFee", bills.getDeliveryFee());
+    jsonObject.put("note", bills.getNote());
+    jsonObject.put("subTotalPrice", bills.getTotalPrice());
+    jsonObject.put("productNameList", bills.getProductList());
+    return jsonObject.toJSONString();
   }
 }

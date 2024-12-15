@@ -1,33 +1,38 @@
 package nhom55.hcmuaf.log;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import nhom55.hcmuaf.enums.LogLevels;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+@AllArgsConstructor
 
 public class Log<T> {
+
+  @JsonIgnore
   private int id;
+  @JsonIgnore
   private String ip;
+  @JsonIgnore
   private LogLevels level;
+  @JsonIgnore
   private String address;
+  @JsonIgnore
   private String national;
+  @JsonIgnore
   private String note;
+  @JsonIgnore
   private String preValue;
+  @JsonIgnore
   private String currentValue;
+  @JsonIgnore
   private LocalDateTime createAt;
+  @JsonIgnore
   private LocalDateTime updateAt;
 
-  public Log() {}
-
-  public Log(int id, String ip, LogLevels level, String address, String national, String note, String preValue, String currentValue, LocalDateTime createAt, LocalDateTime updateAt) {
-    this.id = id;
-    this.ip = ip;
-    this.level = level;
-    this.address = address;
-    this.national = national;
-    this.note = note;
-    this.preValue = preValue;
-    this.currentValue = currentValue;
-    this.createAt = createAt;
-    this.updateAt = updateAt;
+  public Log() {
   }
 
   public Log(String preValue, String currentValue, LocalDateTime updateAt) {

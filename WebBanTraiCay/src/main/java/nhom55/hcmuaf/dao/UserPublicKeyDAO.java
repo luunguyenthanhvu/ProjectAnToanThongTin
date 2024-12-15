@@ -15,4 +15,13 @@ public interface UserPublicKeyDAO {
     int getIdPublicKey(LocalDateTime createDate);
     public boolean setStatusUserPublicKey(int idUser,int idPublicKey, String status);
 
+  /**
+   * Insert new userPublicKey
+   */
+  int insertUserPublicKey(UserPublicKey userPublicKey);
+
+  /**
+   * Get UserPublicKey IN_USE
+   */
+  UserPublicKey userPublicKey(int userId);
 }

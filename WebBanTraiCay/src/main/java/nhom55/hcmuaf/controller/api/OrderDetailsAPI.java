@@ -66,7 +66,7 @@ public class OrderDetailsAPI extends HttpServlet {
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
       switch (context) {
         case "/check-signature":
-          MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO);
+          MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO,request);
           out.println(MyUtils.convertToJson(message));
           break;
       }

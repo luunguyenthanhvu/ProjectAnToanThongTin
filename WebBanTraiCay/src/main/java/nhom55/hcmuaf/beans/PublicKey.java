@@ -1,5 +1,6 @@
 package nhom55.hcmuaf.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -16,6 +17,8 @@ import nhom55.hcmuaf.log.Log;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties({"id", "ip", "level", "address", "national", "note", "preValue",
+    "currentValue", "createAt", "updateAt"})
 public class PublicKey extends Log<PublicKey> implements Serializable, IModel {
 
   int id;

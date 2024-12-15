@@ -1,15 +1,14 @@
 package nhom55.hcmuaf.services;
 
 import java.security.InvalidKeyException;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
+import java.security.spec.InvalidKeySpecException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nhom55.hcmuaf.beans.Bills;
 import nhom55.hcmuaf.beans.PublicKey;
 import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.dao.BillDao;
@@ -28,14 +27,12 @@ import nhom55.hcmuaf.encrypt.DigitalSignature;
 import nhom55.hcmuaf.encrypt.DigitalSignatureImpl;
 import nhom55.hcmuaf.encrypt.Hash;
 import nhom55.hcmuaf.encrypt.HashImpl;
-import nhom55.hcmuaf.enums.LogLevels;
-import nhom55.hcmuaf.enums.PublicKeyStatus;
 import nhom55.hcmuaf.log.AbsDAO;
-import nhom55.hcmuaf.log.Log;
+import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.util.MyUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BillService {
+public class BillService extends AbsDAO {
 
   BillDao billDao;
   Hash hash;
@@ -44,7 +41,14 @@ public class BillService {
   UserPublicKeyDAO userPublicKeyDAO;
   PublicKeyDAO publicKeyDAO;
   LogDao logDao;
-  AbsDAO absDAO;
+  private static BillService instance;
+
+  public static BillService getInstance() {
+    if (instance == null) {
+      instance = new BillService();
+    }
+    return instance;
+  }
 
   public BillService() {
     billDao = new BillDaoImpl();
@@ -54,7 +58,6 @@ public class BillService {
     userPublicKeyDAO = new UserPublicKeyDAOImpl();
     publicKeyDAO = new PublicKeyDAOImpl();
     logDao = new LogDaoImpl();
-    absDAO = AbsDAO.getInstance();
   }
 
   /**
@@ -63,79 +66,72 @@ public class BillService {
    * @param requestDTO
    * @return
    */
-  public MessageResponseDTO checkVerifyUserBill(String requestDTO)
-      throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+  public MessageResponseDTO checkVerifyUserBill(String requestDTO, HttpServletRequest request)
+      throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidKeySpecException, MyHandleException {
     // Convert request dto to entity
     VerifyUserBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
         VerifyUserBillRequestDTO.class);
 
-    // get signature by dto id
+    // Get bill details by id
     var bill = billDao.getABill(dto.getIdBill());
+    System.out.println(bill);
 
-    // check if bill has signature
-    if (bill.getSignature() == null) {
-      // generate default data
-      setUpDefaultData(bill);
+    // Get the public key used to sign the bill
+    UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
+    UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(bill.getUserId());
+    PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+    System.out.println("Public key: " + publicKey);
+
+    // Generate the hash of the bill JSON
+    String billJson = MyUtils.convertBillsJson(bill);
+    System.out.println("Bill JSON: " + billJson);
+    String hashBill = hash.hashText(billJson);
+    System.out.println("Hash after first hashing: " + hashBill);
+    String hash2 = hash.hashText(hashBill);
+    System.out.println("Hash after second hashing: " + hash2);
+
+    // Initialize DigitalSignature object and attempt to verify the signature
+    DigitalSignature digitalSignature = new DigitalSignatureImpl();
+    digitalSignature.loadPublicKey(publicKey.getKey());
+    System.out.println("Public key being used for verification: " + publicKey.getKey());
+
+    // Declare variable for decrypted signature hash
+    String decryptedSignatureHash = null;
+
+    try {
+      // Try to get the decrypted signature hash with the current public key
+      decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
+      System.out.println("Decrypted hash from signature: " + decryptedSignatureHash);
+
+      // If hashes match, verification is successful
+      if (hash2.equals(decryptedSignatureHash)) {
+        return MessageResponseDTO.builder().message("Verify Success!").build();
+      } else {
+        throw new MyHandleException("Signature mismatch with the current public key", 500);
+      }
+    } catch (BadPaddingException e) {
+      // If there's a BadPaddingException (signature doesn't match), try using the previous public key
+      System.out.println("BadPaddingException caught: Trying with the previous public key");
+
+      // Attempt to get the previous public key before the bill creation time
+      try {
+        PublicKey publicKeyBefore = publicKeyDAO.getLatestPublicKeyBefore(bill.getUserId(),
+            bill.getCreationTime());
+        digitalSignature.loadPublicKey(publicKeyBefore.getKey());
+        decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
+
+        // If the decrypted signature matches with the previous public key, verify successfully
+        if (hash2.equals(decryptedSignatureHash)) {
+          return MessageResponseDTO.builder().message("Verify Success with previous public key!")
+              .build();
+        } else {
+          throw new MyHandleException("Invalid signature: Bill is not valid", 500);
+        }
+      } catch (BadPaddingException ex) {
+        // If both public keys fail, throw exception
+        throw new MyHandleException("Unable to verify signature with any public key", 500);
+      }
     }
-
-    // the bill json
-    String billJson = MyUtils.convertBillsJson(bill);
-    String hashBill = hash.hashText(billJson);
-    System.out.println("thử hash");
-    System.out.println("billl id:" + bill.getId());
-    KeyPair keyPair = asymmetric.generateKeyPair();
-    System.out.println("Private key: " + asymmetric.getPrivateKeyAsString());
-    System.out.println("Public key: " + asymmetric.getPublicKeyAsString());
-    System.out.println("Signature bill " + digitalSignature.createSignature(billJson));
-    System.out.println();
-    System.out.println(hashBill);
-    System.out.println(bill.getSignature());
-
-    return MessageResponseDTO.builder().message("Verify Success!").build();
-  }
-
-  private void setUpDefaultData(Bills bill)
-      throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-// the bill json
-    String billJson = MyUtils.convertBillsJson(bill);
-    String hashBill = hash.hashText(billJson);
-    System.out.println("thử hash");
-    System.out.println("billl id:" + bill.getId());
-    KeyPair keyPair = asymmetric.generateKeyPair();
-    System.out.println("Private key: " + asymmetric.getPrivateKeyAsString());
-    System.out.println("Public key: " + asymmetric.getPublicKeyAsString());
-    System.out.println("Signature bill " + digitalSignature.createSignature(billJson));
-    System.out.println();
-    System.out.println(hashBill);
-    System.out.println(bill.getSignature());
-
-    // insert new userKey
-    PublicKey publicKey = PublicKey
-        .builder()
-        .key(asymmetric.getPublicKeyAsString())
-        .build();
-
-    int publicKeyId = publicKeyDAO.insertPublicKey(publicKey);
-
-    // after insert write log
-    Log<PublicKey> publicKeyLog = new Log<>();
-
-    // insert userPublic key
-    UserPublicKey userPublicKey = new UserPublicKey();
-    userPublicKey.setIdPublicKey(publicKeyId);
-    userPublicKey.setIdUser(bill.getUserId());
-    userPublicKey.setStatus(PublicKeyStatus.IN_USE);
-
-    userPublicKey.setId(1);
-
-    // after insert write log
-    Log<UserPublicKey> userPublicKeyLog = new Log<>();
-    userPublicKeyLog.setCreateAt(LocalDateTime.now());
-    userPublicKeyLog
-        .setCurrentValue(MyUtils.convertToJson(userPublicKey));
-    userPublicKeyLog.setLevel(LogLevels.ALERT);
-
-    // update the signature
   }
 
 }
