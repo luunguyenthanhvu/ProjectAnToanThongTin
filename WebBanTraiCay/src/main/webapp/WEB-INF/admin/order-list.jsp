@@ -35,6 +35,28 @@
     font-size: 1.2em;
   }
 
+  .disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .icon-button {
+    background-color: transparent; /* Nền trong suốt */
+    border: none; /* Bỏ viền nút */
+    cursor: pointer; /* Con trỏ chỉ tay */
+    padding: 5px; /* Khoảng cách bên trong nút */
+  }
+
+  .icon-button:hover {
+    opacity: 0.8; /* Hiệu ứng khi rê chuột */
+  }
+
+  .icon-image {
+    width: 24px; /* Đặt kích thước ảnh (thay đổi nếu cần) */
+    height: 24px;
+    object-fit: cover; /* Cắt ảnh cho vừa khung nếu cần */
+    display: block; /* Giảm khoảng cách thừa */
+  }
 </style>
 <body onload="myFunction()" style="margin:0;">
 <div id="loader"></div>
@@ -286,6 +308,7 @@
                         <th style="width: 150px;">Ngày đặt hàng</th>
                         <th style="width: 150px;">Tổng tiền</th>
                         <th style="width: 150px;">Trạng thái</th>
+                        <th style="width: 100px;">Kiểm tra chữ ký</th>
                         <th style="width: 50px;"></th>
                     </tr>
                     <c:forEach items="${listBills}" var="bill">
@@ -297,16 +320,73 @@
                             <td>
                                 <div class="order-status">${bill.getStatus()}</div>
                             </td>
-                            <td class="function-product">
-                                <a href="${pageContext.request.contextPath}/admin/provider/updateOrder?idOrder=${bill.getId()}">
-                                    <svg class="fill-red" xmlns="http://www.w3.org/2000/svg"
-                                         height="1em" viewBox="0 0 512 512">
-                                        <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
-                                        <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"/>
-                                    </svg>
-                                </a>
+                            <c:choose>
+                                <c:when test="${bill.getStatus() == 'Đã hủy'}">
+                                    <td>
+                                        <div style="display: flex; color: red; align-items: center; gap: 3px; cursor:pointer;">
+                                            <img src="${pageContext.request.contextPath}/static/images/icons8-certificate-50.png"
+                                                 alt="Icon" class="icon-image">
+                                            Đã bị hủy
+                                        </div>
+                                    </td>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:choose>
+                                        <c:when test="${bill.getStatus() == 'Đã giao'}">
+                                            <td>
+                                                <div style="display: flex; color: green; align-items: center; gap: 3px; cursor:pointer;">
+                                                    <img src="${pageContext.request.contextPath}/static/images/icons8-certificate-50.png"
+                                                         alt="Icon" class="icon-image">
+                                                    Đã giao
+                                                </div>
+                                            </td>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <td>
+                                                <div id="check-signature-container-${bill.getId()}"
+                                                     onclick="checkSignature('${bill.getId()}')"
+                                                     class="check-signature"
+                                                     style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
+                                                    <img src="${pageContext.request.contextPath}/static/images/icons8-certificate-50.png"
+                                                         alt="Icon" class="icon-image">
+                                                    <!-- Initially, no message, will be added dynamically after AJAX response -->
+                                                    <span style="color: green;"
+                                                          id="status-message-${bill.getId()}">
+                                                        Chưa kiểm tra
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:otherwise>
+                            </c:choose>
+                                <%--                            Edit--%>
+                            <c:choose>
+                                <c:when test="${bill.getStatus() == 'Đã hủy'}">
+                                    <td class="function-product">
+                                        <a class="button-edit-bill"
+                                           href="${pageContext.request.contextPath}/admin/provider/updateOrder?idOrder=${bill.getId()}">
+                                            <svg class="fill-red" xmlns="http://www.w3.org/2000/svg"
+                                                 height="1em" viewBox="0 0 512 512">
+                                                <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+                                                <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td class="function-product">
+                                        <a class="button-edit-bill" href="javascript:void(0)"
+                                           onclick="checkSignatureUrl(${bill.getId()}, '${pageContext.request.contextPath}/admin/provider/updateOrder?idOrder=${bill.getId()}')">
+                                            <svg class="fill-red" xmlns="http://www.w3.org/2000/svg"
+                                                 height="1em" viewBox="0 0 512 512">
+                                                <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </c:otherwise>
+                            </c:choose>
 
-                            </td>
                         </tr>
                     </c:forEach>
                 </table>
@@ -355,6 +435,26 @@
         </div>
     </section>
 </div>
+
+<script> var context = "${pageContext.request.contextPath}";</script>
+<script src="https://kit.fontawesome.com/4c38acb8c6.js" crossorigin="anonymous"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/popper.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery.easing.1.3.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery.waypoints.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery.stellar.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/owl.carousel.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery.magnific-popup.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/aos.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/jquery.animateNumber.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/bootstrap-datepicker.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/scrollax.min.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.2/cloudinary-core-shrinkwrap.min.js"></script>
+<script src="https://kit.fontawesome.com/4c38acb8c6.js" crossorigin="anonymous"></script>
 <script>
   let arrow = document.querySelectorAll(".arrow");
   let closeSideBarBtn = document.querySelector(".btn-close-home");
@@ -398,20 +498,149 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     let orderStatusList = document.querySelectorAll(".order-status");
+    let buttonEditProduct = document.querySelectorAll(".button-edit-bill");
 
-    orderStatusList.forEach(function (status) {
-      if (status.innerHTML.toLowerCase() === "đang xử lý") {
+    // Lặp qua từng trạng thái đơn hàng
+    orderStatusList.forEach(function (status, index) {
+      let statusText = status.innerHTML.toLowerCase().trim(); // Lấy nội dung trạng thái
+
+      // Thêm class cho từng trạng thái
+      if (statusText === "đang xử lý" || statusText === "đang chuẩn bị") {
         status.classList.add('processing-order');
-      } else if (status.innerHTML.toLowerCase() === "đang giao") {
+      } else if (statusText === "đang giao") {
         status.classList.add('on-delivering');
-      } else if (status.innerHTML.toLowerCase() === "đã giao") {
+      } else if (statusText === "đã giao") {
         status.classList.add('delivered');
-      } else if (status.innerHTML.toLowerCase() === "đã hủy") {
+      } else if (statusText === "đã hủy") {
         status.classList.add('cancelled');
       }
     });
   });
 
+  // kiểm tra chữ ký
+  // Kiểm tra tính hợp lệ chữ ký
+  function checkSignature(idBill) {
+    // Hiển thị SweetAlert với loading
+    Swal.fire({
+      title: 'Kiểm tra tính hợp lệ',
+      text: 'Hệ thống đang kiểm tra chữ ký...',
+      allowOutsideClick: false, // Không cho phép click ra ngoài
+      didOpen: () => {
+        Swal.showLoading(); // Bắt đầu hiển thị loading
+      }
+    });
+
+    // Gửi AJAX request sau 2 giây
+    setTimeout(() => {
+      $.ajax({
+        url: `${window.context}/api/order-details/check-signature`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({idBill}),
+        success: function (response) {
+          console.log(response);
+          Swal.close(); // Đóng loading sau khi nhận phản hồi
+
+          // Kiểm tra phản hồi từ server
+          if (response.message === "Verify Success!") {
+            // Show success message from server response
+            const htmlElement = 'status-message-' + idBill;
+            console.log('status-message-${idBill}')
+            const element = document.getElementById(htmlElement);
+            if (element) {
+              element.textContent = 'Hợp lệ';
+            } else {
+              console.log('Element not found');
+            }
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Đơn hàng hợp lệ!',
+              text: 'Bạn có thể cập nhật trạng thái đơn hàng.'
+            }).then(() => {
+              $('#update-status-form').show();
+              $('#check-signature-btn').hide();
+            });
+
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Lỗi hệ thống',
+              text: 'Không thể kiểm tra chữ ký. Vui lòng thử lại.'
+            });
+
+          }
+        },
+        error: function () {
+          Swal.close(); // Đóng loading nếu xảy ra lỗi
+          Swal.fire({
+            icon: 'error',
+            title: 'Đơn hàng không hợp lệ!',
+            text: 'Cửa hàng sẽ hủy đơn hàng này vì đơn hàng đã bị thay đổi.'
+          }).then(() => {
+            // Reload the page after closing the SweetAlert
+            location.reload(); // Refresh the page
+          });
+        }
+      });
+    }, 2000); // Đợi 2 giây trước khi gửi request
+  }
+
+  // Kiểm tra tính hợp lệ chữ ký
+  function checkSignatureUrl(idBill, redirectUrl) {
+    // Hiển thị SweetAlert với loading
+    Swal.fire({
+      title: 'Kiểm tra tính hợp lệ',
+      text: 'Hệ thống đang kiểm tra chữ ký...',
+      allowOutsideClick: false, // Không cho phép click ra ngoài
+      didOpen: () => {
+        Swal.showLoading(); // Bắt đầu hiển thị loading
+      }
+    });
+
+    // Gửi AJAX request sau 2 giây
+    setTimeout(() => {
+      $.ajax({
+        url: `${window.context}/api/order-details/check-signature`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({idBill}),
+        success: function (response) {
+          console.log(response);
+          Swal.close(); // Đóng loading sau khi nhận phản hồi
+
+          // Kiểm tra phản hồi từ server
+          if (response.message === "Verify Success!") {
+            // Hiển thị thông báo thành công
+            Swal.fire({
+              icon: 'success',
+              title: 'Đơn hàng hợp lệ!',
+              text: 'Bạn có thể cập nhật trạng thái đơn hàng.'
+            }).then(() => {
+              // Redirect tới URL sau khi kiểm tra thành công
+              window.location.href = redirectUrl;
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Lỗi hệ thống',
+              text: 'Không thể kiểm tra chữ ký. Vui lòng thử lại.'
+            });
+          }
+        },
+        error: function () {
+          Swal.close(); // Đóng loading nếu có lỗi
+          Swal.fire({
+            icon: 'error',
+            title: 'Đơn hàng không hợp lệ!',
+            text: 'Cửa hàng sẽ hủy đơn hàng này vì đơn hàng đã bị thay đổi.'
+          }).then(() => {
+            location.reload(); // Reload lại trang nếu có lỗi
+          });
+        }
+      });
+    }, 2000); // Đợi 2 giây trước khi gửi request
+  }
 </script>
 </body>
 <script src="https://kit.fontawesome.com/4c38acb8c6.js" crossorigin="anonymous"></script>

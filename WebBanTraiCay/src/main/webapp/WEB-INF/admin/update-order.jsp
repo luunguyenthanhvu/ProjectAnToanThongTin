@@ -94,6 +94,74 @@
     gap: 20px;
   }
 
+  /* Container Form */
+  #update-status-form {
+    width: 100%;
+    max-width: 400px; /* Giới hạn chiều rộng */
+    margin: 20px auto; /* Căn giữa theo chiều ngang */
+    padding: 20px;
+    background-color: #f9f9f9; /* Màu nền sáng */
+    border-radius: 8px; /* Bo góc */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng */
+    font-family: Arial, sans-serif; /* Font chữ dễ nhìn */
+  }
+
+  /* Tiêu đề */
+  #update-status-form h3 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #333; /* Màu chữ */
+    text-align: center;
+    font-weight: bold;
+  }
+
+  /* Select Box */
+  .option-status {
+    width: 100%; /* Chiều rộng đầy đủ */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #555;
+    background-color: #fff;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ bên trong */
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .option-status:focus {
+    border-color: #007bff; /* Đổi màu viền khi focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Hiệu ứng focus */
+  }
+
+  /* Nút Submit */
+  #update-status-form button {
+    width: 100%; /* Nút chiếm toàn bộ chiều rộng */
+    padding: 10px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff; /* Màu xanh */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+
+  #update-status-form button:hover {
+    background-color: #0056b3; /* Màu xanh đậm hơn khi hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Hiệu ứng hover */
+  }
+
+  #update-status-form button:active {
+    background-color: #004080; /* Màu đậm hơn khi nhấn */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Ẩn Input ẩn */
+  input[type="hidden"] {
+    display: none;
+  }
+
 </style>
 <body onload="myFunction()" style="margin:0;">
 <div id="loader"></div>
@@ -311,7 +379,7 @@
             </li>
         </ul>
     </div>
-    <section class="home-section">
+    <div class="home-section">
         <div class="home-content">
             <svg class='bx-menu' xmlns="http://www.w3.org/2000/svg" height="1em"
                  viewBox="0 0 448 512">
@@ -359,26 +427,27 @@
                 </div>
                 <div class="right-container">
                     <div>
-                        <div class="order-verification">
-                            <!-- Nút kiểm tra chữ ký -->
-                            <button id="check-signature-btn" onclick="checkSignature(${idBill})">
-                                Kiểm tra tính hợp lệ
-                            </button>
-                            <div id="update-status-form" style="display: none;">
-                                <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
-                                      method="post">
-                                    <h3>Cập nhập trạng thái</h3>
-                                    <input type="hidden" name="idBill" value="${idBill}">
-                                    <select class="option-status" name="selectedStatus">
-                                        <option>Đang xử lý</option>
-                                        <option>Đang giao</option>
-                                        <option>Đã giao</option>
-                                        <option>Đã hủy</option>
-                                    </select>
-
-                                    <button type="submit">Cập nhập trạng thái</button>
-                                </form>
-                            </div>
+                        <div id="update-status-form">
+                            <c:choose>
+                                <c:when test="${bill.getStatus() == 'Đã hủy'}">
+                                    <h3>Đơn hàng đã bị hủy tuấn ngu ko thể cập nhật trạng thái</h3>
+                                </c:when>
+                                <c:otherwise>
+                                    <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
+                                          method="post">
+                                        <h3>Cập nhập trạng thái</h3>
+                                        <input type="hidden" name="idBill" value="${idBill}">
+                                        <select id="status-select" class="option-status"
+                                                name="selectedStatus"
+                                                data-current-status="${bill.getStatus()}">
+                                            <option value="Đang chuẩn bị">Đang chuẩn bị</option>
+                                            <option value="Đang giao">Đang giao</option>
+                                            <option value="Đã giao">Đã giao</option>
+                                        </select>
+                                        <button type="submit">Cập nhập trạng thái</button>
+                                    </form>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                         <div class="table-wrapper">
                             <table class="table-sanpham">
@@ -413,27 +482,6 @@
                                             <fmt:formatNumber pattern="#,##0 đ"
                                                               value="${billDetail.getQuantity() * billDetail.getProducts().getPrice()}"/>
                                         </td>
-                                            <%--                                        <td class="status">--%>
-                                            <%--                                            <svg style="width: 50px; height: 50px; fill: orange"--%>
-                                            <%--                                                 xmlns="http://www.w3.org/2000/svg"--%>
-                                            <%--                                                 viewBox="0 0 512 512">--%>
-                                            <%--                                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>--%>
-                                            <%--                                            </svg>--%>
-                                            <%--                                        </td>--%>
-                                            <%--                                        <td class="so-luong">--%>
-                                            <%--                                            <button--%>
-                                            <%--                                                    onclick="getShipmentDetails(${billDetail.getProducts().getId()})"--%>
-                                            <%--                                                    style="cursor: pointer; border: none; color: #fff"--%>
-                                            <%--                                                    type="button"--%>
-                                            <%--                                                    class="btn btn-primary btn-get-product"--%>
-                                            <%--                                                    data-toggle="modal" data-target="#exampleModal">--%>
-                                            <%--                                                <svg style="width: 50px; height: 50px; fill: #6a6aff"--%>
-                                            <%--                                                     xmlns="http://www.w3.org/2000/svg"--%>
-                                            <%--                                                     viewBox="0 0 460 512">--%>
-                                            <%--                                                    <path d="M220.6 130.3l-67.2 28.2V43.2L98.7 233.5l54.7-24.2v130.3l67.2-209.3zm-83.2-96.7l-1.3 4.7-15.2 52.9C80.6 106.7 52 145.8 52 191.5c0 52.3 34.3 95.9 83.4 105.5v53.6C57.5 340.1 0 272.4 0 191.6c0-80.5 59.8-147.2 137.4-158zm311.4 447.2c-11.2 11.2-23.1 12.3-28.6 10.5-5.4-1.8-27.1-19.9-60.4-44.4-33.3-24.6-33.6-35.7-43-56.7-9.4-20.9-30.4-42.6-57.5-52.4l-9.7-14.7c-24.7 16.9-53 26.9-81.3 28.7l2.1-6.6 15.9-49.5c46.5-11.9 80.9-54 80.9-104.2 0-54.5-38.4-102.1-96-107.1V32.3C254.4 37.4 320 106.8 320 191.6c0 33.6-11.2 64.7-29 90.4l14.6 9.6c9.8 27.1 31.5 48 52.4 57.4s32.2 9.7 56.8 43c24.6 33.2 42.7 54.9 44.5 60.3s.7 17.3-10.5 28.5zm-9.9-17.9c0-4.4-3.6-8-8-8s-8 3.6-8 8 3.6 8 8 8 8-3.6 8-8z"/>--%>
-                                            <%--                                                </svg>--%>
-                                            <%--                                            </button>--%>
-                                            <%--                                        </td>--%>
                                         <input class="tong-tien" type="hidden"
                                                value="${billDetail.getProducts().getPrice() *billDetail.getQuantity()}">
                                     </tr>
@@ -465,21 +513,11 @@
                     </div>
                 </div>
             </div>
-    </section>
-    <!-- Button to Open the Modal -->
-    <button id="openModalBtn">Open Modal</button>
-
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Modal Header</h2>
-            <p>This is a simple modal.</p>
         </div>
     </div>
 </div>
 <script>
+
   let arrow = document.querySelectorAll(".arrow");
   let closeSideBarBtn = document.querySelector(".btn-close-home");
 
@@ -537,12 +575,40 @@
       totalPrice += Number(getAll.value);
     });
 
-    totalSub.innerHTML = totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+    totalSub.innerHTML = totalPrice.toLocaleString('vi-VN',
+        {style: 'currency', currency: 'VND'});
     finalPrice = totalPrice + shipPrice;
     finalPriceHTML.innerHTML = finalPrice.toLocaleString('vi-VN',
         {style: 'currency', currency: 'VND'});
   });
 
+  document.addEventListener("DOMContentLoaded", function () {
+    const statusSelect = document.getElementById("status-select");
+
+    // Lấy trạng thái hiện tại từ thuộc tính data-current-status
+    const currentStatus = statusSelect.dataset.currentStatus;
+
+    // Map các trạng thái hợp lệ tiếp theo
+    const validTransitions = {
+      "Đang chuẩn bị": ["Đang giao"],
+      "Đang giao": ["Đã giao"],
+      "Đã giao": [] // Không có trạng thái tiếp theo
+    };
+
+    // Xử lý các tùy chọn trong <select>
+    // Đặt trạng thái hiện tại làm giá trị mặc định trong <select>
+    Array.from(statusSelect.options).forEach(option => {
+      if (option.value === currentStatus) {
+        option.selected = true; // Đặt trạng thái hiện tại là được chọn
+      }
+
+      // Vô hiệu hóa các trạng thái không hợp lệ
+      if (!validTransitions[currentStatus]?.includes(option.value) && option.value
+          !== currentStatus) {
+        option.disabled = true;
+      }
+    });
+  });
 
 </script>
 </body>
