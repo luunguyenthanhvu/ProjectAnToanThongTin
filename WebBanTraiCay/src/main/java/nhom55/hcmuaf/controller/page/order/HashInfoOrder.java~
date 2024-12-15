@@ -24,13 +24,13 @@ public class HashInfoOrder extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
 
   }
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
     try {
       HttpSession session = request.getSession();
       Users users = MyUtils.getLoginedUser(session);
@@ -52,7 +52,7 @@ public class HashInfoOrder extends HttpServlet {
       List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
       CartsEntityWebSocket cart = MyUtils.getCart(session);
       if (!checkValidate(request, response, lastName, firstName, address, city, phoneNumber,
-              email)) {
+          email)) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("invalidInfo", "true");
         PrintWriter out = response.getWriter();
@@ -73,20 +73,20 @@ public class HashInfoOrder extends HttpServlet {
           address += ", quận " + district + ", tỉnh " + city;
           // Tạo đối tượng JSON
           Bills bills = Bills
-                  .builder()
-                  .orderedDate(timeOrder)
-                  .productList(productNameList)
-                  .userId(users.getId())
-                  .firstName(firstName)
-                  .lastName(lastName)
-                  .streetAddress(address)
-                  .city(city)
-                  .phoneNumber(phoneNumber)
-                  .deliveryFee(deliveryFeeDouble)
-                  .email(email)
-                  .totalPrice(subTotalPrice)
-                  .note(note)
-                  .build();
+              .builder()
+              .orderedDate(timeOrder)
+              .productList(productNameList)
+              .userId(users.getId())
+              .firstName(firstName)
+              .lastName(lastName)
+              .streetAddress(address)
+              .city(city)
+              .phoneNumber(phoneNumber)
+              .deliveryFee(deliveryFeeDouble)
+              .email(email)
+              .totalPrice(subTotalPrice)
+              .note(note)
+              .build();
           MyUtils.convertBillsJson(bills);
           String jsonString = MyUtils.convertBillsJson(bills);
           System.out.println("Json 1: " + jsonString);
@@ -110,8 +110,8 @@ public class HashInfoOrder extends HttpServlet {
   }
 
   private static boolean checkValidate(HttpServletRequest request, HttpServletResponse response,
-                                       String lastName, String firstName, String address, String city, String phoneNumber,
-                                       String email) {
+      String lastName, String firstName, String address, String city, String phoneNumber,
+      String email) {
     String checkFirstName = OrderValidator.validateFirstName(firstName);
     String checkLastName = OrderValidator.validateLastName(lastName);
     String checkAddress = OrderValidator.validateAddress(address);

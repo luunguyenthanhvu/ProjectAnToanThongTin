@@ -67,33 +67,28 @@ public class ReportAKeyPairOfUser extends HttpServlet {
             RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
 
             // Viết thêm log khi user report key
-            UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
-            userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
-            userPublicKeyDAO.setStatusUserPublicKey(user.getId(),userPublicKeyPreValue.getIdPublicKey(),PublicKeyStatus.BANNED.name());
+            if(userPublicKeyDAO.getUserPublicKey(user.getId()) != null){
+                UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
+                userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
+                userPublicKeyDAO.setStatusUserPublicKey(user.getId(),userPublicKeyPreValue.getIdPublicKey(),PublicKeyStatus.BANNED.name());
 
+                Log<UserPublicKey> usersPublicKeyLog = new Log<>();
+                usersPublicKeyLog.setIp(requestInfo.getIp());
+                usersPublicKeyLog.setAddress(requestInfo.getAddress());
+                usersPublicKeyLog.setNational(requestInfo.getNation());
+                usersPublicKeyLog.setLevel(LogLevels.WARNING);
+                usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.getLevel());
+                usersPublicKeyLog.setCreateAt(timeCreated);
+                usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyPreValue));
+                AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
+                absUserDao.insert(usersPublicKeyLog);
+                request.setAttribute("isReportKeySuccess", true);
+                doGet(request, response);
+            }else{
+                request.setAttribute("isReportKeySuccess", false);
+                doGet(request, response);
+            }
 
-
-            Log<UserPublicKey> usersPublicKeyLog = new Log<>();
-            usersPublicKeyLog.setIp(requestInfo.getIp());
-            usersPublicKeyLog.setAddress(requestInfo.getAddress());
-            usersPublicKeyLog.setNational(requestInfo.getNation());
-            usersPublicKeyLog.setLevel(LogLevels.WARNING);
-            usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.getLevel());
-            usersPublicKeyLog.setCreateAt(timeCreated);
-            usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyPreValue));
-
-
-//
-
-
-            AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
-            absUserDao.insert(usersPublicKeyLog);
-
-
-
-            request.setAttribute("isReportKeySuccess", true);
-
-            doGet(request, response);
 
 
 

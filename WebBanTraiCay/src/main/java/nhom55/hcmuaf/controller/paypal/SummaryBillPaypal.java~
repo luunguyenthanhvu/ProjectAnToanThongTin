@@ -108,16 +108,7 @@ public class SummaryBillPaypal extends HttpServlet {
             }
           }
           deleteCart(session);
-          session.removeAttribute("firstName");
-          session.removeAttribute("lastName");
-          session.removeAttribute("address");
-          session.removeAttribute("city");
-          session.removeAttribute("phoneNumber");
-          session.removeAttribute("email");
-          session.removeAttribute("subtotal");
-          session.removeAttribute("deliveryFee");
-          session.removeAttribute("note");
-          session.removeAttribute("signature");
+          
           //          Thông báo người mua đã đặt thành công
           Properties smtpProperties = MailProperties.getSMTPPro();
           Session session1 = Session.getInstance(smtpProperties, new javax.mail.Authenticator() {
