@@ -148,11 +148,12 @@
 <script src="${pageContext.request.contextPath}/static/js/web-js/check-password-from-KeyPairUser.js"></script>
 <script>
     // Kiểm tra giá trị từ server và gọi SweetAlert
-    // Kiểm tra giá trị từ server và gọi SweetAlert
-    <% if (isReportKeySuccess != null && isReportKeySuccess) { %>
+    <%
+    if (isReportKeySuccess != null && isReportKeySuccess) {
+    %>
     Swal.fire({
         title: 'Thành công!',
-        text: 'Report key đã thành công. Người dùng vui lòng tạo khóa mới để có thể tiếp tục thanh toán !',
+        text: 'Report key đã thành công. Người dùng vui lòng tạo khóa mới để có thể tiếp tục thanh toán!',
         icon: 'success',
         confirmButtonText: 'OK'
     }).then((result) => {
@@ -161,7 +162,25 @@
             window.location.href = 'http://localhost:8080/page/user/general-key-info';
         }
     });
-    <% } %>
+    <%
+    } else if (isReportKeySuccess != null && !isReportKeySuccess) {
+    %>
+    Swal.fire({
+        title: 'Thất bại!',
+        text: 'Bạn chưa tạo key nên không thể thực hiện report key được!',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Chuyển hướng sau khi người dùng nhấn "OK"
+            window.location.href = 'http://localhost:8080/page/user/general-key-info';
+        }
+    });
+    <%
+    }
+    %>
 </script>
+
+
 </body>
 </html>

@@ -275,7 +275,6 @@
                                 <p style="color: red; display: none" id="info_hash_for_user_error"></p>
                                 <div style="margin-top: 10px">
                                     <button class="btn btn-primary py-3 px-4" style="margin-right: 40px" type="button" id="buttonHashInfo">Hash</button>
-                                    <button class="btn btn-primary py-3 px-4" type="button">Tải file Hash về</button>
                                 </div>
                             </div>
                         </div>

@@ -184,6 +184,7 @@ public class MyUtils {
     jsonObject.put("phoneNumber", bills.getPhoneNumber());
     jsonObject.put("email", bills.getEmail());
     jsonObject.put("deliveryFee", bills.getDeliveryFee());
+    jsonObject.put("note", bills.getNote().trim());
     jsonObject.put("subTotalPrice", bills.getTotalPrice());
     jsonObject.put("productNameList", bills.getProductList());
     return jsonObject.toJSONString();
