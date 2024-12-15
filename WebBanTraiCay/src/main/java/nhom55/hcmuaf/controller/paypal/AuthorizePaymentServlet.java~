@@ -113,6 +113,7 @@ public class AuthorizePaymentServlet extends HttpServlet {
             .deliveryFee(deliveryFeeDouble)
             .email(email)
             .totalPrice(subTotalPrice)
+            .note(note)
             .build();
     MyUtils.convertBillsJson(bills);
     String jsonString = MyUtils.convertBillsJson(bills);
