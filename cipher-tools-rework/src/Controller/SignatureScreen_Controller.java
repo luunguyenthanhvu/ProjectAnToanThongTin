@@ -138,7 +138,7 @@ public class SignatureScreen_Controller extends AController<SignatureScreen_View
         String filePath = file.getAbsolutePath();
         if (filePath.contains(".")) {
             String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1);
-            if (!fileExtension.equals("txt") && !fileExtension.equals("txt")) {
+            if (!fileExtension.equals("txt") && !fileExtension.equals("pem")) {
                 // Quăng lỗi nếu đuôi file không phải .txt
                 throw new MyAppException(ErrorType.WRONG_FILE_FORMAT_LOAD_KEY, view);
             }
@@ -258,9 +258,9 @@ public class SignatureScreen_Controller extends AController<SignatureScreen_View
                 "current_algorithm", model.getAvailableAlgorithm().get(1),
                 "current_using_key", PrivateKey.class
         ));
-        model.setCurrentMode(SignatureScreen_Model.INPUT_FILE);
+        model.setCurrentMode(SignatureScreen_Model.INPUT_TEXT);
         model.notifyObservers("change_input_mode", Map.of(
-                "current_input_mode", SignatureScreen_Model.INPUT_FILE
+                "current_input_mode", SignatureScreen_Model.INPUT_TEXT
         ));
     }
 
