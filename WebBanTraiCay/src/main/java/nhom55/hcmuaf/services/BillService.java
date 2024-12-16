@@ -142,7 +142,18 @@ public class BillService extends AbsDAO {
         // If both public keys fail, throw exception
         updateBillWrongSignature(bill);
         throw new MyHandleException("Unable to verify signature with any public key", 500);
+      } catch (IllegalArgumentException ex2) {
+        // case signature updated
+        updateBillWrongSignature(bill);
+        System.out.println(ex2);
+        throw new MyHandleException("Unable to verify signature with any public key", 500);
       }
+
+    } catch (IllegalArgumentException e2) {
+      // case signature updated
+      updateBillWrongSignature(bill);
+      System.out.println(e2);
+      throw new MyHandleException("Unable to verify signature with any public key", 500);
     }
   }
 
@@ -164,9 +175,9 @@ public class BillService extends AbsDAO {
       message.addHeader("Content-type", "text/HTML; charset= UTF-8");
       message.setFrom(new InternetAddress(MailProperties.getEmail()));
       message.addRecipient(Message.RecipientType.TO, new InternetAddress(bills.getEmail()));
-      message.setSubject("Đơn hàng bị hủy");
+      message.setSubject("Đon hang bi huy");
       message.setText(
-          "Vì chính sách bảo mật của công ty. Chúng tôi sẽ hủy đơn hàng của bạn. 🐧🐧🐧🐧🐧");
+          "Vi chinh sach bao mat cua cong ty chung toi se huy don hang cua ban. 🐧🐧🐧🐧🐧");
       Transport.send(message);
     } catch (Exception e) {
       System.out.println("SendEmail File Error " + e);
