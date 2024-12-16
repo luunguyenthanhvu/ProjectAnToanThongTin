@@ -39,6 +39,7 @@ import nhom55.hcmuaf.enums.LogLevels;
 import nhom55.hcmuaf.log.AbsDAO;
 import nhom55.hcmuaf.log.Log;
 import nhom55.hcmuaf.log.RequestInfo;
+import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.sendmail.MailProperties;
 import nhom55.hcmuaf.util.MyUtils;
 import nhom55.hcmuaf.util.OrderValidator;
@@ -142,7 +143,7 @@ public class CheckOut extends HttpServlet {
         UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(users.getId());
         PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
         String publicKeyString = publicKey.getKey();
-        boolean result = checkSingnatureOfUser(hash, jsonString, signatureFromUser,
+        boolean result = checkSingnatureOfUser(request,hash, jsonString, signatureFromUser,
                 publicKeyString);
         if (result) {
           if (billDao.addAListProductToBills(timeNow, productNameList, "Đang chuẩn bị",
@@ -204,6 +205,12 @@ public class CheckOut extends HttpServlet {
             }
           }
         } else {
+          request.setAttribute("firstName", firstName);
+          request.setAttribute("lastName", lastName);
+          request.setAttribute("address", address);
+          request.setAttribute("phone", phoneNumber);
+          request.setAttribute("email", email);
+          request.setAttribute("noteFromUser", note);
           request.setAttribute("wrongSignature", true);
           doGet(request, response);
         }
@@ -280,8 +287,8 @@ public class CheckOut extends HttpServlet {
     cart.deleteItems(productIds);
   }
 
-  public boolean checkSingnatureOfUser(HashImpl anotherHash, String jsonOrder, String signature,
-                                       String publicKeyFromUser) {
+  public boolean checkSingnatureOfUser(HttpServletRequest request,HashImpl anotherHash, String jsonOrder, String signature,
+                                       String publicKeyFromUser) throws MyHandleException {
     try {
       HashImpl hash = anotherHash;
       System.out.println("JsonOrder: " + jsonOrder);
@@ -297,18 +304,10 @@ public class CheckOut extends HttpServlet {
               + "Ket qua hash 2: " + hashInfo);
       System.out.println("2 thang nay bang nhau" + resultHash.equals(hashInfo));
       return resultHash.equals(hashInfo);
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    } catch (InvalidKeySpecException e) {
-      throw new RuntimeException(e);
-    } catch (NoSuchPaddingException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalBlockSizeException e) {
-      throw new RuntimeException(e);
-    } catch (BadPaddingException e) {
-      throw new RuntimeException(e);
-    } catch (InvalidKeyException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      e.printStackTrace();
+      request.setAttribute("errorProcessSignature",true);
+      return false;
     }
   }
 }

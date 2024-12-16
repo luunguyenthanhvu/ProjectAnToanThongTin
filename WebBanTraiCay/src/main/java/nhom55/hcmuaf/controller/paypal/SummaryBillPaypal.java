@@ -26,15 +26,22 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import nhom55.hcmuaf.beans.Bills;
+import nhom55.hcmuaf.beans.PublicKey;
+import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.beans.Users;
 import nhom55.hcmuaf.beans.cart.Cart;
 import nhom55.hcmuaf.beans.cart.CartProduct;
 import nhom55.hcmuaf.dao.BillDao;
 import nhom55.hcmuaf.dao.daoimpl.BillDaoImpl;
+import nhom55.hcmuaf.dao.daoimpl.UserPublicKeyDAOImpl;
+import nhom55.hcmuaf.encrypt.DigitalSignature;
+import nhom55.hcmuaf.encrypt.DigitalSignatureImpl;
+import nhom55.hcmuaf.encrypt.HashImpl;
 import nhom55.hcmuaf.enums.LogLevels;
 import nhom55.hcmuaf.log.AbsDAO;
 import nhom55.hcmuaf.log.Log;
 import nhom55.hcmuaf.log.RequestInfo;
+import nhom55.hcmuaf.my_handle_exception.MyHandleException;
 import nhom55.hcmuaf.sendmail.MailProperties;
 import nhom55.hcmuaf.util.MyUtils;
 import nhom55.hcmuaf.websocket.entities.CartsEntityWebSocket;
@@ -77,8 +84,8 @@ public class SummaryBillPaypal extends HttpServlet {
       double deliveryFee = (Double) session.getAttribute("deliveryFee");
       String note = (String) session.getAttribute("note");
       double subTotalPrice = subtotal;
-      LocalDateTime timeNow = LocalDateTime.now();
-      String productNameList = "";
+      LocalDateTime timeNow = (LocalDateTime) session.getAttribute("timeOrder");
+      String productNameList =(String) session.getAttribute("productNameList");
       // get selected Product for buy
       List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
       CartsEntityWebSocket cart = MyUtils.getCart(session);
@@ -89,22 +96,38 @@ public class SummaryBillPaypal extends HttpServlet {
         BillDao billDao = new BillDaoImpl();
         // biến này sẽ lưu tất cả các hóa đơn người dùng đã mua
         List<Bills> listBills = new ArrayList<>();
-        for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
-          productNameList += itemProduct.getProductName() + ", ";
-        }
-        // Kiểm tra xem có bất kỳ tên sản phẩm nào không
-        if (productNameList.length() > 0) {
-          // Xóa dấu phẩy và khoảng trắng cuối cùng
-          productNameList = productNameList.substring(0, productNameList.length() - 2);
-        }
-        if (billDao.addAListProductToBills(timeNow, productNameList, "Đang giao", users.getId(), 2,
-                firstName, lastName, address, city, phoneNumber, email, subTotalPrice, deliveryFee,
-                note,signatureFromUser,false)) {
-
+        Bills bills = Bills
+                .builder()
+                .orderedDate(timeNow)
+                .productList(productNameList)
+                .userId(users.getId())
+                .firstName(firstName)
+                .lastName(lastName)
+                .streetAddress(address)
+                .city(city)
+                .phoneNumber(phoneNumber)
+                .deliveryFee(deliveryFee)
+                .email(email)
+                .totalPrice(subTotalPrice)
+                .note(note)
+                .build();
+        MyUtils.convertBillsJson(bills);
+        String jsonString = MyUtils.convertBillsJson(bills);
+        System.out.println("Json 2: " + jsonString);
+        UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
+        UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(users.getId());
+        PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+        String publicKeyString = publicKey.getKey();
+        System.out.println("Kết quả: "+checkSingnatureOfUser(request, new HashImpl(), jsonString, signatureFromUser, publicKeyString));
+        if (billDao.addAListProductToBills(timeNow, productNameList, "Đang chuẩn bị",
+                users.getId(),
+                2, firstName, lastName, address, city, phoneNumber, email, subTotalPrice,
+                deliveryFee, note, signatureFromUser, false)) {
           int id_bills = billDao.getIDAListProductFromBills(timeNow, users.getId());
-          for (CartsEntityWebSocket.CartItem itemProduct: cartItem) {
-            if (billDao.addAProductToBillDetails(itemProduct.getId(),id_bills,itemProduct.getQuantity(),itemProduct.getQuantity()*itemProduct.getPrice())) {
-//            billDao.degreeAmountWhenOderingSuccessfully(c.getProducts().getId(), c.getQuantity());
+          for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
+            if (billDao.addAProductToBillDetails(itemProduct.getId(), id_bills,
+                    itemProduct.getQuantity(), itemProduct.getQuantity() * itemProduct.getPrice())) {
+              // billDao.degreeAmountWhenOderingSuccessfully(itemProduct.getId(),itemProduct.getQuantity());
             }
           }
           deleteCart(session);
@@ -118,6 +141,7 @@ public class SummaryBillPaypal extends HttpServlet {
           session.removeAttribute("deliveryFee");
           session.removeAttribute("note");
           session.removeAttribute("signature");
+          session.removeAttribute("productNameList");
           //          Thông báo người mua đã đặt thành công
           Properties smtpProperties = MailProperties.getSMTPPro();
           Session session1 = Session.getInstance(smtpProperties, new javax.mail.Authenticator() {
@@ -175,6 +199,29 @@ public class SummaryBillPaypal extends HttpServlet {
             .map(Integer::valueOf)
             .collect(Collectors.toList());
     cart.deleteItems(productIds);
+  }
+  public boolean checkSingnatureOfUser(HttpServletRequest request, HashImpl anotherHash, String jsonOrder, String signature,
+                                       String publicKeyFromUser) throws MyHandleException {
+    try {
+      HashImpl hash = anotherHash;
+      System.out.println("JsonOrder: " + jsonOrder);
+      String hashInfo = hash.hashText(jsonOrder);
+      System.out.println("Chuỗi hash lần 1: " + hashInfo);
+      hashInfo = hash.hashText(hashInfo);
+      System.out.println("Chuỗi hash lần 2: " + hashInfo);
+      DigitalSignature digitalSignature = new DigitalSignatureImpl();
+      digitalSignature.loadPublicKey(publicKeyFromUser);
+      String resultHash = digitalSignature.getHashFromSignature(signature);
+      System.out.println("Chuỗi hash của user: " + resultHash);
+      System.out.println("Kết quả: mã hóa : " + resultHash + "\n"
+              + "Ket qua hash 2: " + hashInfo);
+      System.out.println("2 thang nay bang nhau" + resultHash.equals(hashInfo));
+      return resultHash.equals(hashInfo);
+    } catch (Exception e) {
+      e.printStackTrace();
+      request.setAttribute("errorProcessSignature",true);
+      return false;
+    }
   }
 
 }
