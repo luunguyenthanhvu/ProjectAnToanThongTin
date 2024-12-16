@@ -430,7 +430,7 @@
                         <div id="update-status-form">
                             <c:choose>
                                 <c:when test="${bill.getStatus() == 'Đã hủy'}">
-                                    <h3>Đơn hàng đã bị hủy tuấn ngu ko thể cập nhật trạng thái</h3>
+                                    <h3>Đơn hàng đã bị hủy bạn ko thể cập nhật trạng thái</h3>
                                 </c:when>
                                 <c:otherwise>
                                     <form action="${pageContext.request.contextPath}/admin/provider/updateOrder"
