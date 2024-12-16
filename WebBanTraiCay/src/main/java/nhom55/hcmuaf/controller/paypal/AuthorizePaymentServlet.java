@@ -43,34 +43,10 @@ public class AuthorizePaymentServlet extends HttpServlet {
 
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    HttpSession session = request.getSession();
-    Users users = MyUtils.getLoginedUser(session);
-    HashImpl hash = (HashImpl) session.getAttribute("hash");
-    double subTotalPrice = 0;
-    String productNameList = "";
-    // get selected Product for buy
-    List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
-    CartsEntityWebSocket cart = MyUtils.getCart(session);
-    if (cart != null && selectedProductIds != null) {
-      // get product list selected from cart
-      List<CartsEntityWebSocket.CartItem> cartItem = cart.getCartItemList();
-      subTotalPrice = (Double) session.getAttribute("subTotalPrice");
-      BillDao billDao = new BillDaoImpl();
-      // biến này sẽ lưu tất cả các hóa đơn người dùng đã mua
-      List<Bills> listBills = new ArrayList<>();
-      LocalDateTime timeNow = LocalDateTime.now();
-      for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
-        productNameList += itemProduct.getProductName() + ", ";
-      }
-      // Kiểm tra xem có bất kỳ tên sản phẩm nào không
-      if (productNameList.length() > 0) {
-        // Xóa dấu phẩy và khoảng trắng cuối cùng
-        productNameList = productNameList.substring(0, productNameList.length() - 2);
-      }
-    }
+          throws ServletException, IOException {
     String signatureFromUser = request.getParameter("signature");
     String lastName = request.getParameter("ho_nguoi-dung");
+    System.out.println("Ho nguoi dung: " + lastName);
     String firstName = request.getParameter("ten_nguoi-dung");
     String address = request.getParameter("dia-chi_nguoi-dung");
     String city = request.getParameter("provinceName");
@@ -82,97 +58,102 @@ public class AuthorizePaymentServlet extends HttpServlet {
     cleanedString = cleanedString.replace(".", "");
     double deliveryFeeDouble = Double.parseDouble(cleanedString);
     String note = request.getParameter("note_nguoi-dung");
-    //       Mặc định cho thanh toán Paypal có idPayment = 2
-    int idPayment = 2;
-    address +=", quận " + district + ", tỉnh " + city;
-    LocalDateTime timeNow = LocalDateTime.now();
-//    Bills bills = new Bills();
-//    bills.setProductList(productNameList);
-//    bills.setStatus("Đang giao");
-//    bills.setUserId(users.getId());
-//    bills.setPayment(idPayment);
-//    bills.setFirstName(firstName);
-//    bills.setLastName(lastName);
-//    bills.setStreetAddress(address);
-//    bills.setCity(city);
-//    bills.setPhoneNumber(phoneNumber);
-//    bills.setEmail(email);
-//    bills.setTotalPrice(subTotalPrice);
-//    bills.setDeliveryFee(deliveryFeeDouble);
-//    bills.setNote(note);
-    Bills bills = Bills
-            .builder()
-            .orderedDate(timeNow)
-            .productList(productNameList)
-            .userId(users.getId())
-            .firstName(firstName)
-            .lastName(lastName)
-            .streetAddress(address)
-            .city(city)
-            .phoneNumber(phoneNumber)
-            .deliveryFee(deliveryFeeDouble)
-            .email(email)
-            .totalPrice(subTotalPrice)
-            .build();
-    MyUtils.convertBillsJson(bills);
-    String jsonString = MyUtils.convertBillsJson(bills);
-    UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
-    UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(users.getId());
-    PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
-    String publicKeyString = publicKey.getKey();
-    boolean result = checkSingnatureOfUser(hash, jsonString, signatureFromUser, publicKeyString);
+    String idVoucherString = request.getParameter("idVoucher");
+    int idVoucher = 0;
+    if (idVoucherString != null && !idVoucherString.trim().isEmpty()) {
+      idVoucher = Integer.valueOf(idVoucherString);
+    }
 
-    try {
-      PaymentServices paymentServices = new PaymentServices();
-      String approvalLink = paymentServices.authorizePayment(bills);
-      session.setAttribute("lastName", lastName);
-      session.setAttribute("firstName", firstName);
-      session.setAttribute("address", address);
-      session.setAttribute("city", city);
-      session.setAttribute("phoneNumber", phoneNumber);
-      session.setAttribute("email", email);
-      session.setAttribute("subtotal", subTotalPrice);
-      session.setAttribute("deliveryFee", deliveryFeeDouble);
-      session.setAttribute("note", note);
-      session.setAttribute("signature", signatureFromUser);
-      response.sendRedirect(approvalLink);
+      HttpSession session = request.getSession();
+      Users users = MyUtils.getLoginedUser(session);
+      HashImpl hash = (HashImpl) session.getAttribute("hash");
+      double subTotalPrice = 0;
+      // get selected Product for buy
+      List<String> selectedProductIds = (List<String>) session.getAttribute("selectedProductIds");
+      CartsEntityWebSocket cart = MyUtils.getCart(session);
+      if (cart != null && selectedProductIds != null) {
+        // get product list selected from cart
+        List<CartsEntityWebSocket.CartItem> cartItem = cart.getCartItemList();
+        subTotalPrice = (Double) session.getAttribute("subTotalPrice");
+        BillDao billDao = new BillDaoImpl();
+        // biến này sẽ lưu tất cả các hóa đơn người dùng đã mua
+        List<Bills> listBills = new ArrayList<>();
+        LocalDateTime timeNow = (LocalDateTime) session.getAttribute("timeOrder");
+        String productNameList = "";
+        for (CartsEntityWebSocket.CartItem itemProduct : cartItem) {
+          productNameList += itemProduct.getProductName() + ", ";
+        }
+        // Kiểm tra xem có bất kỳ tên sản phẩm nào không
+        if (productNameList.length() > 0) {
+          // Xóa dấu phẩy và khoảng trắng cuối cùng
+          productNameList = productNameList.substring(0, productNameList.length() - 2);
+        }
+        int idPayment = 1;
+        address += ", quận " + district + ", tỉnh " + city;
+        //Tạo object order JSON
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("lastName", lastName);
+//        jsonObject.put("firstName", firstName);
+//        jsonObject.put("address", address);
+//        jsonObject.put("city", city);
+//        jsonObject.put("district", district);
+//        jsonObject.put("phoneNumber", phoneNumber);
+//        jsonObject.put("email", email);
+//        jsonObject.put("deliveryFee", deliveryFeeDouble);
+//        jsonObject.put("note", note);
+//        jsonObject.put("subTotalPrice", subTotalPrice);
+//        jsonObject.put("productNameList", productNameList);
+
+        Bills bills = Bills
+                .builder()
+                .orderedDate(timeNow)
+                .productList(productNameList)
+                .userId(users.getId())
+                .firstName(firstName)
+                .lastName(lastName)
+                .streetAddress(address)
+                .city(city)
+                .phoneNumber(phoneNumber)
+                .deliveryFee(deliveryFeeDouble)
+                .email(email)
+                .totalPrice(subTotalPrice)
+                .note(note)
+                .build();
+        MyUtils.convertBillsJson(bills);
+
+        String jsonString = MyUtils.convertBillsJson(bills);
+        System.out.println("Json 2: " + jsonString);
+        UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
+        UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(users.getId());
+        PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+        String publicKeyString = publicKey.getKey();
 
 
-    } catch (PayPalRESTException ex) {
-      request.setAttribute("errorMessage", ex.getMessage());
-      ex.printStackTrace();
+        try {
+          PaymentServices paymentServices = new PaymentServices();
+          String approvalLink = paymentServices.authorizePayment(bills);
+          session.setAttribute("lastName", lastName);
+          session.setAttribute("firstName", firstName);
+          session.setAttribute("address", address);
+          session.setAttribute("city", city);
+          session.setAttribute("phoneNumber", phoneNumber);
+          session.setAttribute("email", email);
+          session.setAttribute("subtotal", subTotalPrice);
+          session.setAttribute("deliveryFee", deliveryFeeDouble);
+          session.setAttribute("note", note);
+          session.setAttribute("signature", signatureFromUser);
+          session.setAttribute("productNameList",productNameList);
+
+          response.sendRedirect(approvalLink);
+
+
+        } catch (PayPalRESTException ex) {
+          request.setAttribute("errorMessage", ex.getMessage());
+          ex.printStackTrace();
 //            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+      }
+
     }
   }
-  public boolean checkSingnatureOfUser(HashImpl anotherHash, String jsonOrder, String signature,
-                                       String publicKeyFromUser) {
-    try {
-      HashImpl hash = anotherHash;
-      System.out.println("JsonOrder: " + jsonOrder);
-      String hashInfo = hash.hashText(jsonOrder);
-      System.out.println("Chuỗi hash lần 1: " + hashInfo);
-      hashInfo = hash.hashText(hashInfo);
-      System.out.println("Chuỗi hash lần 2: " + hashInfo);
-      DigitalSignature digitalSignature = new DigitalSignatureImpl();
-      digitalSignature.loadPublicKey(publicKeyFromUser);
-      String resultHash = digitalSignature.getHashFromSignature(signature);
-      System.out.println("Chuỗi hash của user: " + resultHash);
-      System.out.println("Kết quả: mã hóa : " + resultHash + "\n"
-              + "Ket qua hash 2: " + hashInfo);
-      System.out.println("2 thang nay bang nhau" + resultHash.equals(hashInfo));
-      return resultHash.equals(hashInfo);
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    } catch (InvalidKeySpecException e) {
-      throw new RuntimeException(e);
-    } catch (NoSuchPaddingException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalBlockSizeException e) {
-      throw new RuntimeException(e);
-    } catch (BadPaddingException e) {
-      throw new RuntimeException(e);
-    } catch (InvalidKeyException e) {
-      throw new RuntimeException(e);
-    }
-  }
-}
+
