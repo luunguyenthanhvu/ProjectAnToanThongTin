@@ -85,6 +85,7 @@ public class ReportAKeyPairOfUser extends HttpServlet {
     } else {
       UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
       KeyReportDao keyReportDao = new KeyReportDaoImpl();
+      PublicKeyDAO publicKeyDAO = new PublicKeyDAOImpl();
 
       LocalDateTime timeCreated = LocalDateTime.now();
       RequestInfo requestInfo = new RequestInfo(request.getRemoteAddr(), "HCM", "VietNam");
@@ -98,47 +99,79 @@ public class ReportAKeyPairOfUser extends HttpServlet {
       LocalDateTime endDate = null;
 
       try {
-        startDate = LocalDateTime.parse(startDateStr);  // Giữ cả ngày, giờ, phút, giây
+        startDate = LocalDateTime.parse(startDateStr);
         endDate = LocalDateTime.parse(endDateStr);
       } catch (Exception e) {
         e.printStackTrace();
+        request.setAttribute("errorMessage", "Invalid date format.");
+        doGet(request, response);
         return;
       }
-      UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.userPublicKey(user.getId());
-      // Viết thêm log khi user report key
-      if (userPublicKeyPreValue != null) {
-        // khóa key hiện tại
-//        UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
-        userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
-        userPublicKeyDAO.setStatusUserPublicKey(user.getId(),
-            userPublicKeyPreValue.getIdPublicKey(), PublicKeyStatus.BANNED.name());
 
-        // thêm vào report
-        KeyReport keyReport = new KeyReport();
-        keyReport.setStartDate(startDate);
-        keyReport.setPublicKeyId(userPublicKeyPreValue.getId());
-        keyReport.setEndDate(endDate);
-        keyReport.setReason(reason);
-        keyReportDao.addNewKeyReport(keyReport);
+      try {
+        PublicKey publicKey = publicKeyDAO.getPublicKey(
+            userPublicKeyDAO.userPublicKey(user.getId()).getIdPublicKey());
+        LocalDateTime createDate = publicKey.getCreateDate();
 
-        Log<UserPublicKey> usersPublicKeyLog = new Log<>();
-        usersPublicKeyLog.setIp(requestInfo.getIp());
-        usersPublicKeyLog.setAddress(requestInfo.getAddress());
-        usersPublicKeyLog.setNational(requestInfo.getNation());
-        usersPublicKeyLog.setLevel(LogLevels.WARNING);
-        usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.getLevel());
-        usersPublicKeyLog.setCreateAt(timeCreated);
-        usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyPreValue));
-        AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
-        absUserDao.insert(usersPublicKeyLog);
-        request.setAttribute("isReportKeySuccess", true);
-        doGet(request, response);
-      } else {
-        request.setAttribute("isReportKeySuccess", false);
+        // Validate startDate and endDate
+        if (startDate.isBefore(createDate)) {
+          request.setAttribute("errorMessage",
+              "Start date cannot be earlier than the public key creation date.");
+          doGet(request, response);
+          return;
+        }
+
+        if (endDate.isBefore(startDate)) {
+          request.setAttribute("errorMessage", "End date cannot be earlier than the start date.");
+          doGet(request, response);
+          return;
+        }
+
+        if (endDate.isAfter(LocalDateTime.now())) {
+          request.setAttribute("errorMessage", "End date cannot be in the future.");
+          doGet(request, response);
+          return;
+        }
+
+        // Proceed with report creation if validation passes
+        UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.userPublicKey(user.getId());
+        if (userPublicKeyPreValue != null) {
+          userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
+          userPublicKeyDAO.setStatusUserPublicKey(user.getId(),
+              userPublicKeyPreValue.getIdPublicKey(), PublicKeyStatus.BANNED.name());
+
+          // Add new key report
+          KeyReport keyReport = new KeyReport();
+          keyReport.setStartDate(startDate);
+          keyReport.setPublicKeyId(userPublicKeyPreValue.getId());
+          keyReport.setEndDate(endDate);
+          keyReport.setReason(reason);
+          keyReportDao.addNewKeyReport(keyReport);
+
+          // Log the action
+          Log<UserPublicKey> usersPublicKeyLog = new Log<>();
+          usersPublicKeyLog.setIp(requestInfo.getIp());
+          usersPublicKeyLog.setAddress(requestInfo.getAddress());
+          usersPublicKeyLog.setNational(requestInfo.getNation());
+          usersPublicKeyLog.setLevel(LogLevels.WARNING);
+          usersPublicKeyLog.setNote(LogNote.USER_REPORT_PUBLIC_KEY.getLevel());
+          usersPublicKeyLog.setCreateAt(timeCreated);
+          usersPublicKeyLog.setCurrentValue(MyUtils.convertToJson(userPublicKeyPreValue));
+          AbsDAO<UserPublicKey> absUserDao = new AbsDAO<>();
+          absUserDao.insert(usersPublicKeyLog);
+
+          request.setAttribute("isReportKeySuccess", true);
+          doGet(request, response);
+        } else {
+          request.setAttribute("isReportKeySuccess", false);
+          doGet(request, response);
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+        request.setAttribute("errorMessage", "An error occurred while processing your request.");
         doGet(request, response);
       }
-
-
     }
   }
+
 }

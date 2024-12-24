@@ -134,12 +134,27 @@
 
 <!-- END nav -->
 
+<%-- Existing JSP content --%>
+
 <div class="main-user-content" style="background-color: #e7e6e6; width: 100%">
     <div class="rootContainer">
         <div class="containerCreateKey">
             <a style="display: inline-block; text-align: left; float: left"
                href="${pageContext.request.contextPath}/page/user/general-key-info">Quay về</a>
             <h1 style="color: #a1b85d">Report khóa</h1>
+
+            <%-- Display error messages if present --%>
+            <%
+                String errorMessage = (String) request.getAttribute("errorMessage");
+                if (errorMessage != null && !errorMessage.isEmpty()) {
+            %>
+            <div class="alert alert-danger" role="alert" style="color: red; margin-bottom: 15px;">
+                <%= errorMessage %>
+            </div>
+            <%
+                }
+            %>
+
             <div class="form-group create-date-container">
                 <h6 class="create-date-label">Ngày tạo khóa công khai:</h6>
                 <span id="createDatePublicKey" class="create-date-value">
@@ -171,8 +186,9 @@
 
         </div>
     </div>
-
 </div>
+
+<%-- Existing loader and scripts --%>
 
 
 <!-- loader -->
@@ -185,6 +201,7 @@
                 stroke="#F96D00"/>
     </svg>
 </div>
+<script> var context = "${pageContext.request.contextPath}";</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
@@ -215,7 +232,7 @@
   }).then((result) => {
     if (result.isConfirmed) {
       // Chuyển hướng sau khi người dùng nhấn "OK"
-      window.location.href = 'http://localhost:8080/page/user/general-key-info';
+      window.location.href = `${pageContext.request.contextPath}/page/user/general-key-info`;
     }
   });
   <%
@@ -229,46 +246,12 @@
   }).then((result) => {
     if (result.isConfirmed) {
       // Chuyển hướng sau khi người dùng nhấn "OK"
-      window.location.href = 'http://localhost:8080/page/user/general-key-info';
+      window.location.href = `${pageContext.request.contextPath}/page/user/general-key-info`;
     }
   });
   <%
   }
   %>
-</script>
-<script>
-  // Kiểm tra ngày bắt đầu và ngày kết thúc trước khi gửi form
-  document.querySelector("form").addEventListener("submit", function (event) {
-    const startDate = new Date(document.getElementById("startDate").value);
-    const endDate = new Date(document.getElementById("endDate").value);
-    const currentDate = new Date();
-
-    // Kiểm tra ngày bắt đầu (startDate >= ngày tạo key)
-    const keyCreationDate = new Date("2024-03-26T17:02:00");
-
-    if (startDate < keyCreationDate) {
-      Swal.fire({
-        title: 'Lỗi',
-        text: 'Ngày bắt đầu phải lớn hơn hoặc bằng ngày tạo key.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      event.preventDefault();  // Ngừng gửi form
-      return;
-    }
-
-    // Kiểm tra ngày kết thúc (endDate <= hiện tại)
-    if (endDate > currentDate) {
-      Swal.fire({
-        title: 'Lỗi',
-        text: 'Ngày kết thúc không thể lớn hơn ngày hiện tại.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      event.preventDefault();  // Ngừng gửi form
-      return;
-    }
-  });
 </script>
 
 </body>
