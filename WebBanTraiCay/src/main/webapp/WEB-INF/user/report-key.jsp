@@ -104,17 +104,24 @@
             <h1 style="color: #a1b85d">Report khóa</h1>
             <form action="${pageContext.request.contextPath}/page/user/report-a-key-pair-of-user" method="post">
                 <div class="form-group">
-                    <label for="public-key">Lý do report:</label>
+                    <label for="reason">Lý do report:</label>
                     <div>
-                    <textarea autofocus="true" cols="117" rows="8"  type="text" id="public-key">
-                </textarea>
+                        <textarea name="reason" cols="117" rows="8" id="reason" required></textarea>
                     </div>
-
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Ngày bắt đầu:</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Ngày kết thúc:</label>
+                    <input type="date" id="endDate" name="endDate" required>
                 </div>
                 <div class="button-group">
                     <button class="generate-btn">Report</button>
                 </div>
             </form>
+
         </div>
     </div>
 
