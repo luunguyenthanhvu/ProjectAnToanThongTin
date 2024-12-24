@@ -54,14 +54,14 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/web-css/toast.css">
 
 
-
 </head>
 <body class="goto-here">
 <nav class="navbar-container navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light"
      id="ftco-navbar">
     <div class="container navbar-container">
         <div class="navbar-brand">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/page/home">Cửa Hàng Trái
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/page/home">Cửa Hàng
+                Trái
                 Cây</a>
         </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
@@ -73,8 +73,9 @@
             <ul class="navbar-nav">
                 <li class="nav-item active"><a href="${pageContext.request.contextPath}/page/home"
                                                class="nav-link">Trang Chủ</a></li>
-                <li class="nav-item"><a href="${pageContext.request.contextPath}/page/shop/shop-forward"
-                                        class="nav-link">Cửa Hàng</a></li>
+                <li class="nav-item"><a
+                        href="${pageContext.request.contextPath}/page/shop/shop-forward"
+                        class="nav-link">Cửa Hàng</a></li>
                 <li class="nav-item"><a href="${pageContext.request.contextPath}/page/about"
                                         class="nav-link">Về Chúng Tôi</a></li>
                 <li class="nav-item"><a href="${pageContext.request.contextPath}/page/contact"
@@ -154,54 +155,85 @@
             <div style="display: block" class="col-md-10 mb-5 text-center">
                 <div class="tab-content" id="pills-tabContent">
                     <form style="position: relative; top:-40px; left: 350px"
-                          action="${pageContext.request.contextPath}/page/shop/shop-controller?index=1" method="post">
+                          action="${pageContext.request.contextPath}/page/shop/shop-controller?index=1"
+                          method="post">
                         <input style="width: 300px" type="text"
                                placeholder="Tìm trái cây mà bạn cần" name="txtSearch">
                         <input style="width: 100px" type="submit" value="Tìm kiếm">
                     </form>
                     <%--                    html của filter --%>
                     <div style="margin-left: 110%">
-                        <svg  onclick="toggleFilter()" class="filter-icon" style="display: block;  cursor: pointer;"  xmlns="http://www.w3.org/2000/svg" height="16" width="16"
-                              viewBox="0 0 512 512">
+                        <svg onclick="toggleFilter()" class="filter-icon"
+                             style="display: block;  cursor: pointer;"
+                             xmlns="http://www.w3.org/2000/svg" height="16" width="16"
+                             viewBox="0 0 512 512">
                             <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
                             <path d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"/>
-                        </svg></div>
+                        </svg>
+                    </div>
 
-                    <div  id="filter" class="filter-container" style="  display: none;position: absolute; background-color: #f9f9f9;padding: 20px;border: 1px solid black;z-index: 1;width: 300px;left: 110%">
-                        <form action="${pageContext.request.contextPath}/page/shop/filter-for-all-product" method="Post" onsubmit="prepareFormData()">
+                    <div id="filter" class="filter-container"
+                         style="  display: none;position: absolute; background-color: #f9f9f9;padding: 20px;border: 1px solid black;z-index: 1;width: 300px;left: 110%">
+                        <form action="${pageContext.request.contextPath}/page/shop/filter-for-all-product"
+                              method="Post" onsubmit="prepareFormData()">
                             <fieldset style=" border: 2px solid #82ae46;">
                                 <legend style="width: 150px;font-size: 18px;">Lọc theo giá</legend>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="price_sortAscFilter" name="price_sortAsc" value=""> Giá tăng dần</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="price_sortDescFilter" name="price_sortDesc" value=""> Giá giảm dần</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="price_sortAscFilter"
+                                        name="price_sortAsc" value=""> Giá tăng dần</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="price_sortDescFilter"
+                                        name="price_sortDesc" value=""> Giá giảm dần</label>
                             </fieldset>
                             <fieldset style=" border: 2px solid #82ae46;">
                                 <legend style="width: 150px;font-size: 18px;">Lọc theo tên</legend>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="name_sortAscFilter" name="name_sortAsc" value=""> Tên A-Z</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="name_sortDescFilter" name="name_sortDesc" value=""> Tên Z-A</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="name_sortAscFilter"
+                                        name="name_sortAsc" value=""> Tên A-Z</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="name_sortDescFilter"
+                                        name="name_sortDesc" value=""> Tên Z-A</label>
                             </fieldset>
                             <fieldset style=" border: 2px solid #82ae46;">
                                 <legend style="width: 150px;font-size: 18px;">Lọc theo ngày</legend>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="date_sortFilter" name="date_sort" value=""> Ngày nhập kho mới nhất</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="date_sortFilter" name="date_sort"
+                                        value=""> Ngày nhập kho mới nhất</label>
                             </fieldset>
                             <fieldset style=" border: 2px solid #82ae46;">
                                 <legend style="width: 150px;font-size: 18px;">Lọc theo mùa</legend>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="springFilter" name="spring" value=""> Trái cây mùa xuân</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="summerFilter" name="summer" value=""> Trái cây mùa hạ</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="autumnFilter" name="autumn" value=""> Trái cây mùa thu</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="winterFilter" name="winter" value=""> Trái cây mùa đông</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="springFilter" name="spring" value="">
+                                    Trái cây mùa xuân</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="summerFilter" name="summer" value="">
+                                    Trái cây mùa hạ</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="autumnFilter" name="autumn" value="">
+                                    Trái cây mùa thu</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="winterFilter" name="winter" value="">
+                                    Trái cây mùa đông</label>
                             </fieldset>
                             <fieldset style=" border: 2px solid #82ae46;">
                                 <legend style="width: 150px;font-size: 18px;">Lựa chọn khác</legend>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="localFilter" name="local" value=""> Trái cây trong nước</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="importedFilter" name="imported" value=""> Trái cây nhập khẩu</label>
-                                <label style=" display: block;margin-bottom: 10px;"><input type="checkbox" class="driedFilter" name="dried" value=""> Trái cây khô</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="localFilter" name="local" value="">
+                                    Trái cây trong nước</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="importedFilter" name="imported"
+                                        value=""> Trái cây nhập khẩu</label>
+                                <label style=" display: block;margin-bottom: 10px;"><input
+                                        type="checkbox" class="driedFilter" name="dried" value="">
+                                    Trái cây khô</label>
                             </fieldset>
                             <input style="margin-top: 5px" type="submit" value="Lọc">
                         </form>
                     </div>
 
 
-                    <div class="tab-pane fade active show" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+                    <div class="tab-pane fade active show" id="pills-profile" role="tabpanel"
+                         aria-labelledby="pills-profile-tab" tabindex="0">
                         <div class="row">
 
 
@@ -255,35 +287,51 @@
                         <ul>
                             <%--                            Trường hợp tìm ra số sản phẩm chỉ có trong 1 trang thì 2 nút <,> ko được xài--%>
                             <c:if test="${pageId== 1 && indexEnd ==1}">
-                                <li><a >&lt;</a></li>
-                                <c:forEach begin="1" end="${indexEnd}" var= "i">
-                                    <li id="${i}" ><a  href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a></li>
+                                <li><a>&lt;</a></li>
+                                <c:forEach begin="1" end="${indexEnd}" var="i">
+                                    <li id="${i}"><a
+                                            href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a>
+                                    </li>
                                 </c:forEach>
-                                <li><a >></a></li>
+                                <li><a>></a></li>
                             </c:if>
 
                             <c:if test="${ indexEnd !=1}">
                                 <%--                                Trường hợp đang ở trang 1 thì chỉ ko được xài nút <--%>
-                                <c:if test="${pageId ==1}" >
-                                    <li><a >&lt;</a></li>
-                                    <c:forEach begin="1" end="${indexEnd}" var= "i">
-                                        <li id="${i}" ><a  href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a></li>
+                                <c:if test="${pageId ==1}">
+                                    <li><a>&lt;</a></li>
+                                    <c:forEach begin="1" end="${indexEnd}" var="i">
+                                        <li id="${i}"><a
+                                                href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a>
+                                        </li>
                                     </c:forEach>
-                                    <li><a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId+1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&gt;</a></li>
+                                    <li>
+                                        <a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId+1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&gt;</a>
+                                    </li>
                                 </c:if>
                                 <%--                                 Còn trường hợp này nút nào cũng xài được--%>
-                                <c:if test="${pageId >1 && pageId<indexEnd}" >
-                                    <li><a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId-1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&lt;</a></li>
-                                    <c:forEach begin="1" end="${indexEnd}" var= "i">
-                                        <li id="${i}" ><a  href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a></li>
+                                <c:if test="${pageId >1 && pageId<indexEnd}">
+                                    <li>
+                                        <a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId-1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&lt;</a>
+                                    </li>
+                                    <c:forEach begin="1" end="${indexEnd}" var="i">
+                                        <li id="${i}"><a
+                                                href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a>
+                                        </li>
                                     </c:forEach>
-                                    <li><a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId+1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&gt;</a></li>
+                                    <li>
+                                        <a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId+1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&gt;</a>
+                                    </li>
                                 </c:if>
                                 <%--                                Trường hợp đang ở trang cuối thì chỉ ko được xài nút >--%>
-                                <c:if test="${pageId ==indexEnd}" >
-                                    <li><a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId-1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&lt;</a></li>
-                                    <c:forEach begin="1" end="${indexEnd}" var= "i">
-                                        <li id="${i}" ><a  href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a></li>
+                                <c:if test="${pageId ==indexEnd}">
+                                    <li>
+                                        <a href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${pageId-1}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">&lt;</a>
+                                    </li>
+                                    <c:forEach begin="1" end="${indexEnd}" var="i">
+                                        <li id="${i}"><a
+                                                href="${pageContext.request.contextPath}/page/shop/shop-controller?index=${i}&txtSearch=${txtSearch}&sortBy=${sortBy}&order=${order}">${i}</a>
+                                        </li>
                                     </c:forEach>
                                     <li><a>></a></li>
                                 </c:if>
@@ -313,9 +361,12 @@
                     <h2 class="ftco-heading-2">Trái cây tươi ngon</h2>
                     <p>Trúc xinh trúc mọc đầu đình, ai quen mua hoa quả lại càng thêm xinh.</p>
                     <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
-                        <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                        <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                        <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+                        <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a>
+                        </li>
+                        <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a>
+                        </li>
+                        <li class="ftco-animate"><a href="#"><span
+                                class="icon-instagram"></span></a></li>
                     </ul>
                 </div>
             </div>
@@ -323,9 +374,12 @@
                 <div class="ftco-footer-widget mb-4 ml-md-5">
                     <h2 class="ftco-heading-2">Menu</h2>
                     <ul class="list-unstyled">
-                        <li><a href="${pageContext.request.contextPath}/page/shop/shop-forward" class="py-2 d-block">Cửa hàng chúng tôi</a></li>
-                        <li><a href="${pageContext.request.contextPath}/page/about" class="py-2 d-block">Về chúng tôi</a></li>
-                        <li><a  href="${pageContext.request.contextPath}/page/contact" class="py-2 d-block">Liên hệ với chúng tôi</a></li>
+                        <li><a href="${pageContext.request.contextPath}/page/shop/shop-forward"
+                               class="py-2 d-block">Cửa hàng chúng tôi</a></li>
+                        <li><a href="${pageContext.request.contextPath}/page/about"
+                               class="py-2 d-block">Về chúng tôi</a></li>
+                        <li><a href="${pageContext.request.contextPath}/page/contact"
+                               class="py-2 d-block">Liên hệ với chúng tôi</a></li>
                     </ul>
                 </div>
             </div>
@@ -393,56 +447,76 @@
 </div>
 <%--Script xuất hiện bảng cho filter--%>
 <script>
-    document.getElementById('${pageId}').classList.add("active")
+  document.getElementById('${pageId}').classList.add("active")
 
-    function toggleFilter() {
-        var filter = document.getElementById("filter");
-        if (filter.style.display === "block") {
-            filter.style.display = "none";
-        } else {
-            filter.style.display = "block";
+  function toggleFilter() {
+    var filter = document.getElementById("filter");
+    if (filter.style.display === "block") {
+      filter.style.display = "none";
+    } else {
+      filter.style.display = "block";
+    }
+  }
+
+  function prepareFormData() {
+
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    // Lặp qua từng checkbox
+    checkboxes.forEach(function (checkbox) {
+      // Nếu checkbox được chọn, thiết lập lại giá trị của nó là 'on'
+      if (checkbox.checked) {
+        switch (checkbox.name) {
+          case 'price_sortAsc':
+            document.querySelector('.price_sortAscFilter').value = 'price-Asc';
+            break;
+          case 'price_sortDesc':
+            document.querySelector('.price_sortDescFilter').value = 'price-Desc';
+            break;
+          case 'name_sortAsc':
+            document.querySelector('.name_sortAscFilter').value = 'nameOfProduct-Asc';
+            break;
+          case 'name_sortDesc':
+            document.querySelector('.name_sortDescFilter').value = 'nameOfProduct-Desc';
+            break;
+          case 'date_sort':
+            document.querySelector('.date_sortFilter').value = 'dateOfImporting-Desc';
+            break;
+          case 'spring':
+            document.querySelector('.springFilter').value = 'spring';
+            break;
+          case 'summer':
+            document.querySelector('.summerFilter').value = 'summer';
+            break;
+          case 'autumn':
+            document.querySelector('.autumnFilter').value = 'autumn';
+            break;
+          case 'winter':
+            document.querySelector('.winterFilter').value = 'winter';
+            break;
+          case 'local':
+            document.querySelector('.localFilter').value = 'local';
+            break;
+          case 'imported':
+            document.querySelector('.importedFilter').value = 'imported';
+            break;
+          case 'dried':
+            document.querySelector('.driedFilter').value = 'dried';
+            break;
+
         }
-    }
+      } else {
+        // Nếu không được chọn, thiết lập lại giá trị của nó là ''
+        checkbox.value = '';
+      }
 
-
-
-
-
-    function prepareFormData() {
-
-        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        // Lặp qua từng checkbox
-        checkboxes.forEach(function(checkbox) {
-            // Nếu checkbox được chọn, thiết lập lại giá trị của nó là 'on'
-            if (checkbox.checked) {
-                switch (checkbox.name) {
-                    case 'price_sortAsc': document.querySelector('.price_sortAscFilter').value = 'price-Asc'; break;
-                    case 'price_sortDesc': document.querySelector('.price_sortDescFilter').value = 'price-Desc'; break;
-                    case 'name_sortAsc': document.querySelector('.name_sortAscFilter').value = 'nameOfProduct-Asc'; break;
-                    case 'name_sortDesc':document.querySelector('.name_sortDescFilter').value = 'nameOfProduct-Desc'; break;
-                    case 'date_sort': document.querySelector('.date_sortFilter').value = 'dateOfImporting-Desc'; break;
-                    case 'spring':document.querySelector('.springFilter').value = 'spring'; break;
-                    case 'summer': document.querySelector('.summerFilter').value = 'summer'; break;
-                    case 'autumn': document.querySelector('.autumnFilter').value = 'autumn'; break;
-                    case 'winter': document.querySelector('.winterFilter').value = 'winter'; break;
-                    case 'local': document.querySelector('.localFilter').value = 'local'; break;
-                    case 'imported': document.querySelector('.importedFilter').value = 'imported'; break;
-                    case 'dried': document.querySelector('.driedFilter').value = 'dried'; break;
-
-                }
-            } else {
-                // Nếu không được chọn, thiết lập lại giá trị của nó là ''
-                checkbox.value = '';
-            }
-
-        });
-    }
-
-
+    });
+  }
 
 
 </script>
-<script> var context = "${pageContext.request.contextPath}";</script>
+<script> var context = "${pageContext.request.contextPath}";
+var websocket = "localhost:8080";
+</script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>

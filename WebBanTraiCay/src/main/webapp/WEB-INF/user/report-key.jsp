@@ -185,6 +185,7 @@
                 stroke="#F96D00"/>
     </svg>
 </div>
+<script> var context = "${pageContext.request.contextPath}";</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>

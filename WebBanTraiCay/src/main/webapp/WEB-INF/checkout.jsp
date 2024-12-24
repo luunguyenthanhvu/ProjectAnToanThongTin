@@ -252,37 +252,45 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="note_user">Ghi chú </label>
-                                <textarea autofocus name="note_nguoi-dung" style="color: black !important;"
+                                <textarea autofocus name="note_nguoi-dung"
+                                          style="color: black !important;"
                                           id="note_user" type="text" class="form-control"
-                                          placeholder="Ghi chú"  rows="8"
+                                          placeholder="Ghi chú" rows="8"
                                           cols="10">
                                     ${noteFromUser}
-                                      </textarea>
+                                </textarea>
                             </div>
                         </div>
                         <div class="col-md-6" style="position: relative; top: -100px">
                             <span>Nếu bạn chưa có tool ký số của web chúng tôi có thể tải</span>
-                            <a href="${pageContext.request.contextPath}/download/cipher-tool">Tại đây</a>
+                            <a href="${pageContext.request.contextPath}/download/cipher-tool">Tại
+                                đây</a>
                             <div class="form-group">
 
                             </div>
                         </div>
                         <div class="w-100"></div>
-                        <div class="col-md-6" >
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="info_hash_for_user">Thông tin đặt hàng người dùng được hash</label>
-                                <input id="info_hash_for_user"  type="text">
-                                <p style="color: red; display: none" id="info_hash_for_user_error"></p>
+                                <label for="info_hash_for_user">Thông tin đặt hàng người dùng được
+                                    hash</label>
+                                <input id="info_hash_for_user" type="text">
+                                <p style="color: red; display: none"
+                                   id="info_hash_for_user_error"></p>
                                 <div style="margin-top: 10px">
-                                    <button class="btn btn-primary py-3 px-4" style="margin-right: 40px" type="button" id="buttonHashInfo">Hash</button>
+                                    <button class="btn btn-primary py-3 px-4"
+                                            style="margin-right: 40px" type="button"
+                                            id="buttonHashInfo">Hash
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6" >
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="signature_from_user">Chữ ký của người dùng</label>
                                 <input name="signature" id="signature_from_user" type="text">
-                                <p style="color: red; display: none" id="signature_from_user_error"></p>
+                                <p style="color: red; display: none"
+                                   id="signature_from_user_error"></p>
                                 <div style="margin-top: 10px">
 
 
@@ -310,7 +318,7 @@
                                 <p class="d-flex">
                                     <span>Phí vận chuyển</span>
                                     <span id="delivery_fee"></span>
-                                    <input  type="hidden" name="delivery_fee"
+                                    <input type="hidden" name="delivery_fee"
                                            id="hidden_delivery_fee" value="">
                                 </p>
                                 <hr>
@@ -596,30 +604,28 @@
   }
 
   function validateAddress() {
-      var kyTuHopLe =/\b(\S.+?)\b\s+\1\b/gi;
-      var text = diaChi.value; // Lấy giá trị từ input
-      var error = document.getElementById("address_error");
+    var kyTuHopLe = /\b(\S.+?)\b\s+\1\b/gi;
+    var text = diaChi.value; // Lấy giá trị từ input
+    var error = document.getElementById("address_error");
 
-      // Kiểm tra nếu chuỗi trống
-      if (text.length == 0 || text == null) {
-          error.textContent = "Vui lòng nhập dữ liệu";
-          error.style.display = "block";
-          return false;
-      }
+    // Kiểm tra nếu chuỗi trống
+    if (text.length == 0 || text == null) {
+      error.textContent = "Vui lòng nhập dữ liệu";
+      error.style.display = "block";
+      return false;
+    }
 
-      // Kiểm tra tính hợp lệ của chuỗi
-      if (kyTuHopLe.test(text)) {
-          error.textContent = "Địa chỉ bạn nhập không hợp lệ. Vui lòng nhập lại";
-          error.style.display = "block";
-          return false;
-      }
+    // Kiểm tra tính hợp lệ của chuỗi
+    if (kyTuHopLe.test(text)) {
+      error.textContent = "Địa chỉ bạn nhập không hợp lệ. Vui lòng nhập lại";
+      error.style.display = "block";
+      return false;
+    }
 
-      // Nếu hợp lệ
-      error.style.display = "none";
-      return true;
+    // Nếu hợp lệ
+    error.style.display = "none";
+    return true;
   }
-
-
 
   function validateSDT() {
     var text = sdt.value;
@@ -692,6 +698,7 @@
       return true;
     }
   }
+
   function validateHash() {
     var text = hashInfo.value;
     var error = document.getElementById("info_hash_for_user_error");
@@ -704,6 +711,7 @@
       return true;
     }
   }
+
   function validateSignature() {
     var text = signatureFromUser.value;
     var error = document.getElementById("signature_from_user_error");
@@ -769,8 +777,8 @@
     var isSdtValid = validateSDT();
     var isEmailValid = validateEmail();
     var checkedButton = document.querySelector(".check");
-      var isHashValid = validateHash();
-      var isSignatureValid = validateSignature();
+    var isHashValid = validateHash();
+    var isSignatureValid = validateSignature();
     if (!isHoValid || !isTenValid || !isDiaChiValid || !isSdtValid || !isEmailValid
         || !checkedButton.checked || !isHashValid || !isSignatureValid) {
       event.preventDefault();
@@ -842,28 +850,30 @@
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script> var context = "${pageContext.request.contextPath}";</script>
+<script> var context = "${pageContext.request.contextPath}";
+var websocket = "localhost:8080";
+</script>
 <%--Js xử lý lấy dữ liệu vận chuyển--%>
 <script src="${pageContext.request.contextPath}/static/js/web-js/process-delivery-fee.js?v=12"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/hash-info-order.js?v=1423"></script>
 <script>
-    // Kiểm tra giá trị từ server và gọi SweetAlert
-    <% if (wrongSignature != null && wrongSignature) { %>
-    Swal.fire({
-        title: 'Thông báo!',
-        text: 'Chữ ký không đúng. Vui lòng kiểm tra lại chữ ký !',
-        icon: 'info',
-        confirmButtonText: 'OK'
-    });
-    <% }  %>
+  // Kiểm tra giá trị từ server và gọi SweetAlert
+  <% if (wrongSignature != null && wrongSignature) { %>
+  Swal.fire({
+    title: 'Thông báo!',
+    text: 'Chữ ký không đúng. Vui lòng kiểm tra lại chữ ký !',
+    icon: 'info',
+    confirmButtonText: 'OK'
+  });
+  <% }  %>
   //Kiểm tra chữ ký có hợp lệ ko
   <% if (errorProcessSignature != null && errorProcessSignature) { %>
   Swal.fire({
-      title: 'Thông báo!',
-      text: 'Chữ ký không hợp lệ. Vui lòng kiểm tra lại chữ ký !',
-      icon: 'info',
-      confirmButtonText: 'OK'
+    title: 'Thông báo!',
+    text: 'Chữ ký không hợp lệ. Vui lòng kiểm tra lại chữ ký !',
+    icon: 'info',
+    confirmButtonText: 'OK'
   });
   <% }  %>
 </script>
