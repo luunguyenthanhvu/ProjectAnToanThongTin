@@ -824,6 +824,15 @@ CREATE TABLE `user_public_key` (
 `idPublicKey` int(11) NOT NULL,
 `status` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE key_reported (
+    id int(11) NOT NULL,
+    publicKeyId int(11) NOT NULL,
+    startDate datetime,
+    endDate datetime,
+    reason TEXT
+ )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Chỉ mục cho các bảng đã đổ
 --
@@ -838,6 +847,11 @@ ALTER TABLE `bills`
 --
 ALTER TABLE `public_key` 
   ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `key_reported`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `publicKeyId` (`publicKeyId`);
+
 ALTER TABLE `user_public_key`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idUser` (`idUser`),
@@ -970,6 +984,8 @@ ALTER TABLE `carts`
 -- Auto increment cho bang publickey
 
 ALTER TABLE `user_public_key`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `key_reported`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `public_key`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -1113,6 +1129,9 @@ ALTER TABLE `shipment_transactions`
 ALTER TABLE `user_public_key`
   ADD CONSTRAINT `user_public_key_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `user_public_key_ibfk_2` FOREIGN KEY (`idPublicKey`) REFERENCES `public_key` (`id`);
+
+ALTER TABLE `key_reported`
+  ADD CONSTRAINT `key_reported_bfk_1` FOREIGN KEY (`publicKeyId`) REFERENCES `public_key` (`id`);
 --
 -- Các ràng buộc cho bảng `users`
 --
