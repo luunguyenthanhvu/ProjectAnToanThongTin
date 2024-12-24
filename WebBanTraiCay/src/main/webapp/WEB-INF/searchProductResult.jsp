@@ -443,7 +443,7 @@
 
 </script>
 <script> var context = "${pageContext.request.contextPath}";</script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/index-page1.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/popper.min.js"></script>
