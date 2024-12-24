@@ -1,13 +1,10 @@
 package nhom55.hcmuaf.services;
 
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.Properties;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -80,7 +77,7 @@ public class BillService extends AbsDAO {
    * @return
    */
   public MessageResponseDTO checkVerifyUserBill(String requestDTO, HttpServletRequest request)
-      throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidKeySpecException, MyHandleException {
+      throws MyHandleException {
     // Convert request dto to entity
     VerifyUserBillRequestDTO dto = MyUtils.convertJsonToObject(requestDTO,
         VerifyUserBillRequestDTO.class);
@@ -97,8 +94,6 @@ public class BillService extends AbsDAO {
     String decryptedSignatureHash = null;
     // Generate the hash of the bill JSON
     String billJson = MyUtils.convertBillsJson(bill);
-    String hashBill = hash.hashText(billJson);
-    String hash2 = hash.hashText(hashBill);
     // Initialize DigitalSignature object and attempt to verify the signature
     DigitalSignature digitalSignature = new DigitalSignatureImpl();
 
@@ -106,7 +101,8 @@ public class BillService extends AbsDAO {
       // get user public key
       UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(bill.getUserId());
       PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
-
+      String hashBill = hash.hashText(billJson);
+      String hash2 = hash.hashText(hashBill);
       digitalSignature.loadPublicKey(publicKey.getKey());
       // Try to get the decrypted signature hash with the current public key
       decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
@@ -140,7 +136,8 @@ public class BillService extends AbsDAO {
       try {
         PublicKey publicKeyBefore = publicKeyDAO.getLatestPublicKeyBefore(bill.getUserId(),
             bill.getCreationTime());
-
+        String hashBill = hash.hashText(billJson);
+        String hash2 = hash.hashText(hashBill);
         digitalSignature.loadPublicKey(publicKeyBefore.getKey());
         decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
 
@@ -172,17 +169,34 @@ public class BillService extends AbsDAO {
         // If both public keys fail, throw exception
         updateBillWrongSignature(bill);
         throw new MyHandleException("Unable to verify signature with any public key", 500);
-      } catch (IllegalArgumentException ex2) {
+      } catch (IllegalArgumentException | NoSuchAlgorithmException |
+               IllegalBlockSizeException authEx) {
         // case signature updated
+        // IllegalArgumentException / IllegalBlockSizeException is wrong signature
         updateBillWrongSignature(bill);
-        System.out.println(ex2);
+        authEx.printStackTrace();
+        throw new MyHandleException("Unable to verify signature with any public key", 500);
+
+      } catch (Exception e2) {
+        // case signature updated
+        // IllegalArgumentException / IllegalBlockSizeException is wrong signature
+        updateBillWrongSignature(bill);
+        e2.printStackTrace();
         throw new MyHandleException("Unable to verify signature with any public key", 500);
       }
-
-    } catch (IllegalArgumentException e2) {
+    } catch (IllegalArgumentException | NoSuchAlgorithmException |
+             IllegalBlockSizeException authEx) {
       // case signature updated
+      // IllegalArgumentException / IllegalBlockSizeException is wrong signature
       updateBillWrongSignature(bill);
-      System.out.println(e2);
+      authEx.printStackTrace();
+      throw new MyHandleException("Unable to verify signature with any public key", 500);
+
+    } catch (Exception e2) {
+      // case signature updated
+      // IllegalArgumentException / IllegalBlockSizeException is wrong signature
+      updateBillWrongSignature(bill);
+      e2.printStackTrace();
       throw new MyHandleException("Unable to verify signature with any public key", 500);
     }
   }
