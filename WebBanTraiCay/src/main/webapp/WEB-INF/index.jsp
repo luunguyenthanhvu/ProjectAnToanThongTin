@@ -411,6 +411,7 @@
     </svg>
 </div>
 <script> var context = "${pageContext.request.contextPath}";
+var websocket = "localhost:8443";
 document.addEventListener('DOMContentLoaded', (event) => {
   initializeWebSocket();
 });

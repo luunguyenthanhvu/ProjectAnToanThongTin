@@ -13,7 +13,7 @@ async function hashInfoOrder() {
         note_nguoi_dung: document.getElementById("note_user").value,
     });
 
-    fetch('http://localhost:8080/page/order/hash-info-order', {
+    fetch('https://localhost:8443/page/order/hash-info-order', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded', // Đổi content-type

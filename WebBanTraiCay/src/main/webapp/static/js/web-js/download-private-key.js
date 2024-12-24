@@ -1,6 +1,6 @@
 async function downloadPrivateKey() {
     try {
-        const response = await fetch("http://localhost:8080/download/private-key", {
+        const response = await fetch("https://localhost:8443/download/private-key", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded' // Dữ liệu được gửi dạng URL-encoded

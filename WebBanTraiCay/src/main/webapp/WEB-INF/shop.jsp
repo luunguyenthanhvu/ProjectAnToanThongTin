@@ -411,6 +411,10 @@
 <script> var context = "${pageContext.request.contextPath}";
 var seachText = "${requestScope.productName}";
 var category = "${requestScope.category}";
+var websocket = "localhost:8080";
+document.addEventListener('DOMContentLoaded', (event) => {
+    initializeWebSocket();
+});
 </script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
