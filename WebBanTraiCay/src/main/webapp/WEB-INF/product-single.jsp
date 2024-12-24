@@ -385,7 +385,7 @@
 <script src="${pageContext.request.contextPath}/static/js/main.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.2/cloudinary-core-shrinkwrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/product-single.js?v=5"></script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/index-page1.js?v=8"></script>
 <script src="${pageContext.request.contextPath}/static/js/read-more/jquery.readall.js"></script>
 <script>
   $(document).ready(function () {

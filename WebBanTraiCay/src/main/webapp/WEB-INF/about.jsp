@@ -448,7 +448,7 @@
 <script src="${pageContext.request.contextPath}/https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
 <script src="${pageContext.request.contextPath}/static/js/google-map.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/main.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/index-page1.js?v=8"></script>
 
 </body>
 </html>

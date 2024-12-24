@@ -292,7 +292,7 @@
         integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/index-page1.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/popper.min.js"></script>

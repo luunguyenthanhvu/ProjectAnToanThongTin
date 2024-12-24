@@ -199,7 +199,7 @@ function showToast(response) {
   if (response === "Success") {
     toast({
       title: 'Thành công',
-      message: 'Sản phẩm đã được thêm vào giỏ hàng!',
+      message: 'San pham da duoc them vao gio hang!',
       type: 'success',
       duration: 3000
     })

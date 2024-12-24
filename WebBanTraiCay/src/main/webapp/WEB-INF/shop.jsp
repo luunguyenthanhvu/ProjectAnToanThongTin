@@ -432,7 +432,7 @@ var category = "${requestScope.category}";
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.2/cloudinary-core-shrinkwrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/index-page1.js?v=8"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/shop.js?v=7"></script>
 
 
