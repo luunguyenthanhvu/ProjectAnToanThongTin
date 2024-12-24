@@ -25,7 +25,7 @@ public class OrderDetailsAPI extends HttpServlet {
     super.init();
     // Initialize the ProductService here
     this.productService = new ProductService();
-    this.billService = new BillService();
+    this.billService = BillService.getInstance();
   }
 
   @Override
@@ -66,7 +66,7 @@ public class OrderDetailsAPI extends HttpServlet {
       String requestDTO = (String) request.getAttribute(REQUEST_BODY);
       switch (context) {
         case "/check-signature":
-          MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO,request);
+          MessageResponseDTO message = billService.checkVerifyUserBill(requestDTO, request);
           out.println(MyUtils.convertToJson(message));
           break;
       }
