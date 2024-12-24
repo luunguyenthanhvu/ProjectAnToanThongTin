@@ -3,6 +3,7 @@ package nhom55.hcmuaf.controller.user;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,11 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhom55.hcmuaf.beans.KeyReport;
+import nhom55.hcmuaf.beans.PublicKey;
 import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.beans.Users;
 import nhom55.hcmuaf.dao.KeyReportDao;
+import nhom55.hcmuaf.dao.PublicKeyDAO;
 import nhom55.hcmuaf.dao.UserPublicKeyDAO;
 import nhom55.hcmuaf.dao.daoimpl.KeyReportDaoImpl;
+import nhom55.hcmuaf.dao.daoimpl.PublicKeyDAOImpl;
 import nhom55.hcmuaf.dao.daoimpl.UserPublicKeyDAOImpl;
 import nhom55.hcmuaf.enums.LogLevels;
 import nhom55.hcmuaf.enums.LogNote;
@@ -34,23 +38,37 @@ public class ReportAKeyPairOfUser extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     HttpSession session = request.getSession();
-    Users user = MyUtils.getLoginedUser(session);
-    Boolean isVerified = (Boolean) session.getAttribute("isAllowedEditedKeyPair");
-    Long verifiedAt = (Long) session.getAttribute("verifiedForKeyPairAt");
-    if (isVerified != null && isVerified && verifiedAt != null) {
-      long currentTime = System.currentTimeMillis();
-      if (currentTime - verifiedAt <= VERIFIED_TIME_LIMIT) {
-        request.setAttribute("user", user);
-        // Người dùng đã xác minh trong thời hạn 30 phút
-        RequestDispatcher dispatcher = this.getServletContext()
-            .getRequestDispatcher("/WEB-INF/user/report-key.jsp");
-        dispatcher.forward(request, response);
-        return;
-      } else {
-        // Hết thời gian xác minh
-        session.removeAttribute("isAllowedEditedKeyPair");
-        session.removeAttribute("verifiedForKeyPairAt");
+    try {
+      Users user = MyUtils.getLoginedUser(session);
+      Boolean isVerified = (Boolean) session.getAttribute("isAllowedEditedKeyPair");
+      Long verifiedAt = (Long) session.getAttribute("verifiedForKeyPairAt");
+      UserPublicKeyDAO userPublicKeyDAO = new UserPublicKeyDAOImpl();
+      PublicKeyDAO publicKeyDAO = new PublicKeyDAOImpl();
+
+      PublicKey publicKey = publicKeyDAO.getPublicKey(
+          userPublicKeyDAO.userPublicKey(user.getId()).getIdPublicKey());
+
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+      session.setAttribute("createDatePublicKey", publicKey.getCreateDate().format(formatter));
+
+      if (isVerified != null && isVerified && verifiedAt != null) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - verifiedAt <= VERIFIED_TIME_LIMIT) {
+          request.setAttribute("user", user);
+          // Người dùng đã xác minh trong thời hạn 30 phút
+          RequestDispatcher dispatcher = this.getServletContext()
+              .getRequestDispatcher("/WEB-INF/user/report-key.jsp");
+          dispatcher.forward(request, response);
+          return;
+        } else {
+          // Hết thời gian xác minh
+          session.removeAttribute("isAllowedEditedKeyPair");
+          session.removeAttribute("verifiedForKeyPairAt");
+        }
       }
+    } catch (Exception e) {
+      // something went wrong!
+      e.printStackTrace();
     }
     // Nếu chưa xác minh hoặc hết hạn, điều hướng về trang xác minh
     response.sendRedirect(request.getContextPath() + "/page/user/general-key-info");
@@ -80,19 +98,17 @@ public class ReportAKeyPairOfUser extends HttpServlet {
       LocalDateTime endDate = null;
 
       try {
-        startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
-        endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+        startDate = LocalDateTime.parse(startDateStr);  // Giữ cả ngày, giờ, phút, giây
+        endDate = LocalDateTime.parse(endDateStr);
       } catch (Exception e) {
-        request.setAttribute("isReportKeySuccess", false);
-        request.setAttribute("errorMessage", "Invalid date format.");
-        doGet(request, response);
+        e.printStackTrace();
         return;
       }
-
+      UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.userPublicKey(user.getId());
       // Viết thêm log khi user report key
-      if (userPublicKeyDAO.getUserPublicKey(user.getId()) != null) {
+      if (userPublicKeyPreValue != null) {
         // khóa key hiện tại
-        UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
+//        UserPublicKey userPublicKeyPreValue = userPublicKeyDAO.getUserPublicKey(user.getId());
         userPublicKeyPreValue.setStatus(PublicKeyStatus.BANNED);
         userPublicKeyDAO.setStatusUserPublicKey(user.getId(),
             userPublicKeyPreValue.getIdPublicKey(), PublicKeyStatus.BANNED.name());
@@ -103,8 +119,6 @@ public class ReportAKeyPairOfUser extends HttpServlet {
         keyReport.setPublicKeyId(userPublicKeyPreValue.getId());
         keyReport.setEndDate(endDate);
         keyReport.setReason(reason);
-        System.out.println("long cacwj" + keyReport);
-        System.out.println("luuw vaof key report");
         keyReportDao.addNewKeyReport(keyReport);
 
         Log<UserPublicKey> usersPublicKeyLog = new Log<>();
