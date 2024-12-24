@@ -483,6 +483,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.2/cloudinary-core-shrinkwrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/load-image.js?v=1"
         charset="UTF-8"></script>
-<script src="${pageContext.request.contextPath}/static/js/admin-js/add-new-products2.js?v=2"
+<script src="${pageContext.request.contextPath}/static/js/admin-js/add-new-products2.js?v=3"
         charset="UTF-8"></script>
 </html>

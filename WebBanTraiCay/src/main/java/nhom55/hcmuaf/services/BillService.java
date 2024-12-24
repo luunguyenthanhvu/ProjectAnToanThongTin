@@ -3,6 +3,7 @@ package nhom55.hcmuaf.services;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDateTime;
 import java.util.Properties;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -17,13 +18,16 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nhom55.hcmuaf.beans.Bills;
+import nhom55.hcmuaf.beans.KeyReport;
 import nhom55.hcmuaf.beans.PublicKey;
 import nhom55.hcmuaf.beans.UserPublicKey;
 import nhom55.hcmuaf.dao.BillDao;
+import nhom55.hcmuaf.dao.KeyReportDao;
 import nhom55.hcmuaf.dao.LogDao;
 import nhom55.hcmuaf.dao.PublicKeyDAO;
 import nhom55.hcmuaf.dao.UserPublicKeyDAO;
 import nhom55.hcmuaf.dao.daoimpl.BillDaoImpl;
+import nhom55.hcmuaf.dao.daoimpl.KeyReportDaoImpl;
 import nhom55.hcmuaf.dao.daoimpl.LogDaoImpl;
 import nhom55.hcmuaf.dao.daoimpl.PublicKeyDAOImpl;
 import nhom55.hcmuaf.dao.daoimpl.UserPublicKeyDAOImpl;
@@ -87,8 +91,27 @@ public class BillService extends AbsDAO {
 
     // Get the public key used to sign the bill
     UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
+    KeyReportDao keyReportDao = new KeyReportDaoImpl();
+
+    // get user public key
     UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(bill.getUserId());
     PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+
+    // check if public key was report?
+    KeyReport keyReport = keyReportDao.getKeyReportByPublicKeyId(publicKey.getId());
+    if (keyReport != null) {
+      LocalDateTime startDate = keyReport.getStartDate();
+      LocalDateTime endDate = keyReport.getEndDate();
+      LocalDateTime orderedDate = bill.getOrderedDate();
+
+      // Kiểm tra xem orderedDate có nằm trong khoảng startDate và endDate không
+      if ((orderedDate.isEqual(startDate) || orderedDate.isAfter(startDate)) &&
+          (orderedDate.isEqual(endDate) || orderedDate.isBefore(endDate))) {
+        System.out.println("Ordered date is within the reported range.");
+        throw new MyHandleException("This bill is not valid", 500);
+      }
+    }
+
     System.out.println("Public key: " + publicKey);
 
     // Generate the hash of the bill JSON
@@ -127,6 +150,21 @@ public class BillService extends AbsDAO {
       try {
         PublicKey publicKeyBefore = publicKeyDAO.getLatestPublicKeyBefore(bill.getUserId(),
             bill.getCreationTime());
+
+        // check if public key was report?
+        KeyReport keyReport2 = keyReportDao.getKeyReportByPublicKeyId(publicKey.getId());
+        if (keyReport2 != null) {
+          LocalDateTime startDate = keyReport2.getStartDate();
+          LocalDateTime endDate = keyReport2.getEndDate();
+          LocalDateTime orderedDate = bill.getOrderedDate();
+
+          // Kiểm tra xem orderedDate có nằm trong khoảng startDate và endDate không
+          if ((orderedDate.isEqual(startDate) || orderedDate.isAfter(startDate)) &&
+              (orderedDate.isEqual(endDate) || orderedDate.isBefore(endDate))) {
+            System.out.println("Ordered date is within the reported range.");
+            throw new MyHandleException("This bill is not valid", 500);
+          }
+        }
         digitalSignature.loadPublicKey(publicKeyBefore.getKey());
         decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
 
