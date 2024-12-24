@@ -1,5 +1,5 @@
 async function createNewAPairKey() {
-  const { value: password } = await Swal.fire({
+  const {value: password} = await Swal.fire({
     title: "Xác minh người dùng",
     input: "password",
     inputLabel: "Vui lòng nhập mật khẩu để xác minh danh tính",
@@ -14,19 +14,19 @@ async function createNewAPairKey() {
   if (password) {
     console.log("Password entered:", password); // Kiểm tra giá trị
     const result = await checkUser(password);
-    if(result.status === "fail"){
+    if (result.status === "fail") {
       Swal.fire({
         icon: "error",
         title: "Xác minh thất bại",
         text: "Mật khẩu không đúng. Vui lòng nhập lại"
       });
-    }else{
-      window.location.href = `http://localhost:8080/page/user/create-a-key-pair-for-user`;
+    } else {
+      window.location.href = `${window.context}/page/user/create-a-key-pair-for-user`;
     }
   }
 }
 
-async function reportAPairKey(){
+async function reportAPairKey() {
   const {value: password} = await Swal.fire({
     title: "Xác minh người dùng",
     input: "password",
@@ -42,14 +42,20 @@ async function reportAPairKey(){
   if (password) {
     console.log("Password entered:", password); // Kiểm tra giá trị
     const result = await checkUser(password);
-    if(result.status === "fail"){
+    if (result.status === "fail") {
       Swal.fire({
         icon: "error",
         title: "Xác minh thất bại",
         text: "Mật khẩu không đúng. Vui lòng nhập lại"
       });
-    }else{
-      window.location.href = `http://localhost:8080/page/user/report-a-key-pair-of-user`;
+    } else if (result.status === "inValidKey") {
+      Swal.fire({
+        icon: "error",
+        title: "Không có key",
+        text: "Bạn không có key để report."
+      });
+    } else {
+      window.location.href = `${window.context}/page/user/report-a-key-pair-of-user`;
     }
   }
 
@@ -57,13 +63,14 @@ async function reportAPairKey(){
 
 async function checkUser(passwordFromUser) {
   try {
-    const response = await fetch("http://localhost:8080/page/user/general-key-info", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded' // Dữ liệu được gửi dạng URL-encoded
-      },
-      body: `password=${encodeURIComponent(passwordFromUser)}` // Dữ liệu dưới dạng chuỗi
-    });
+    const response = await fetch(
+        `${window.context}/page/user/general-key-info`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded' // Dữ liệu được gửi dạng URL-encoded
+          },
+          body: `password=${encodeURIComponent(passwordFromUser)}` // Dữ liệu dưới dạng chuỗi
+        });
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

@@ -17,8 +17,10 @@
 
     <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap"
           rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Amatic+SC:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&display=swap"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC:400,700&display=swap"
+          rel="stylesheet">
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/static/css/web-css/open-iconic-bootstrap.min.css">
@@ -48,18 +50,45 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/web-css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/web-css/fix.css">
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/user-css/report-khoa-cua-nguoi-dung.css?=9">
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/static/css/user-css/report-khoa-cua-nguoi-dung.css?=9">
 
 </head>
+<style>
+  .create-date-container {
+    padding: 10px;
+    background-color: #f9f9f9; /* Màu nền nhạt */
+    border: 1px solid #dcdcdc; /* Viền nhẹ */
+    border-radius: 8px; /* Bo góc */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng */
+    margin: 15px 0; /* Khoảng cách giữa các phần tử */
+  }
+
+  .create-date-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333; /* Màu chữ đậm */
+    margin-right: 10px; /* Khoảng cách với giá trị */
+  }
+
+  .create-date-value {
+    font-size: 16px;
+    color: #5a5a5a; /* Màu chữ nhạt hơn */
+    font-style: italic; /* In nghiêng để phân biệt */
+  }
+
+</style>
 <body class="goto-here">
 <%
     // Lấy giá trị attribute isReportKeySuccess từ /page/user/report-a-key-pair-of-user
     Boolean isReportKeySuccess = (Boolean) request.getAttribute("isReportKeySuccess");
 %>
-<nav class="navbar-container navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+<nav class="navbar-container navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light"
+     id="ftco-navbar">
     <div class="container navbar-container">
         <div class="navbar-brand">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/page/home">Cửa Hàng Trái Cây</a>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/page/home">Cửa Hàng
+                Trái Cây</a>
         </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
                 aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,12 +100,20 @@
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">Thông tin người dùng</a>
                 <div class="dropdown-menu account-menu" aria-labelledby="dropdown04">
-                    <a class="account dropdown-item" href="${pageContext.request.contextPath}/page/user/user-profile">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>
+                    <a class="account dropdown-item"
+                       href="${pageContext.request.contextPath}/page/user/user-profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+                            <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+                            <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/>
+                        </svg>
                         Người Dùng
                     </a>
-                    <a class="account dropdown-item" href="${pageContext.request.contextPath}/page/logout">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+                    <a class="account dropdown-item"
+                       href="${pageContext.request.contextPath}/page/logout">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
+                            <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+                            <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/>
+                        </svg>
                         Đăng Xuất
                     </a>
                 </div>
@@ -86,49 +123,85 @@
 </nav>
 
 <style>
-    .navbar-brand {
-        margin-right: 250px;
-    }
+  .navbar-brand {
+    margin-right: 250px;
+  }
 
-    .nav-item dropdown {
-        margin-left: 250px;
-    }
+  .nav-item dropdown {
+    margin-left: 250px;
+  }
 </style>
 
 <!-- END nav -->
 
+<%-- Existing JSP content --%>
+
 <div class="main-user-content" style="background-color: #e7e6e6; width: 100%">
     <div class="rootContainer">
         <div class="containerCreateKey">
-            <a style="display: inline-block; text-align: left; float: left" href="${pageContext.request.contextPath}/page/user/general-key-info" >Quay về</a>
+            <a style="display: inline-block; text-align: left; float: left"
+               href="${pageContext.request.contextPath}/page/user/general-key-info">Quay về</a>
             <h1 style="color: #a1b85d">Report khóa</h1>
-            <form action="${pageContext.request.contextPath}/page/user/report-a-key-pair-of-user" method="post">
-                <div class="form-group">
-                    <label for="public-key">Lý do report:</label>
-                    <div>
-                    <textarea autofocus="true" cols="117" rows="8"  type="text" id="public-key">
-                </textarea>
-                    </div>
 
+            <%-- Display error messages if present --%>
+            <%
+                String errorMessage = (String) request.getAttribute("errorMessage");
+                if (errorMessage != null && !errorMessage.isEmpty()) {
+            %>
+            <div class="alert alert-danger" role="alert" style="color: red; margin-bottom: 15px;">
+                <%= errorMessage %>
+            </div>
+            <%
+                }
+            %>
+
+            <div class="form-group create-date-container">
+                <h6 class="create-date-label">Ngày tạo khóa công khai:</h6>
+                <span id="createDatePublicKey" class="create-date-value">
+                    <%= session.getAttribute("createDatePublicKey") != null
+                            ? session.getAttribute("createDatePublicKey")
+                            : "Không có thông tin ngày" %>
+                </span>
+            </div>
+            <form action="${pageContext.request.contextPath}/page/user/report-a-key-pair-of-user"
+                  method="post">
+                <div class="form-group">
+                    <label for="reason">Lý do report:</label>
+                    <div>
+                        <textarea name="reason" cols="117" rows="8" id="reason" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Ngày bắt đầu:</label>
+                    <input type="datetime-local" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Ngày kết thúc:</label>
+                    <input type="datetime-local" id="endDate" name="endDate" required>
                 </div>
                 <div class="button-group">
                     <button class="generate-btn">Report</button>
                 </div>
             </form>
+
         </div>
     </div>
-
 </div>
+
+<%-- Existing loader and scripts --%>
 
 
 <!-- loader -->
 <div id="ftco-loader" class="show fullscreen">
     <svg class="circular" width="48px" height="48px">
-        <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/>
-        <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+        <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4"
+                stroke="#eeeeee"/>
+        <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4"
+                stroke-miterlimit="10"
                 stroke="#F96D00"/>
     </svg>
 </div>
+<script> var context = "${pageContext.request.contextPath}";</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery-migrate-3.0.1.min.js"></script>
@@ -147,40 +220,39 @@
 <script src="${pageContext.request.contextPath}/static/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/check-password-from-KeyPairUser.js"></script>
 <script>
-    // Kiểm tra giá trị từ server và gọi SweetAlert
-    <%
-    if (isReportKeySuccess != null && isReportKeySuccess) {
-    %>
-    Swal.fire({
-        title: 'Thành công!',
-        text: 'Report key đã thành công. Người dùng vui lòng tạo khóa mới để có thể tiếp tục thanh toán!',
-        icon: 'success',
-        confirmButtonText: 'OK'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Chuyển hướng sau khi người dùng nhấn "OK"
-            window.location.href = 'http://localhost:8080/page/user/general-key-info';
-        }
-    });
-    <%
-    } else if (isReportKeySuccess != null && !isReportKeySuccess) {
-    %>
-    Swal.fire({
-        title: 'Thất bại!',
-        text: 'Bạn chưa tạo key nên không thể thực hiện report key được!',
-        icon: 'warning',
-        confirmButtonText: 'OK'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Chuyển hướng sau khi người dùng nhấn "OK"
-            window.location.href = 'http://localhost:8080/page/user/general-key-info';
-        }
-    });
-    <%
+  // Kiểm tra giá trị từ server và gọi SweetAlert
+  <%
+  if (isReportKeySuccess != null && isReportKeySuccess) {
+  %>
+  Swal.fire({
+    title: 'Thành công!',
+    text: 'Report key đã thành công. Người dùng vui lòng tạo khóa mới để có thể tiếp tục thanh toán!',
+    icon: 'success',
+    confirmButtonText: 'OK'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Chuyển hướng sau khi người dùng nhấn "OK"
+      window.location.href = `${pageContext.request.contextPath}/page/user/general-key-info`;
     }
-    %>
+  });
+  <%
+  } else if (isReportKeySuccess != null && !isReportKeySuccess) {
+  %>
+  Swal.fire({
+    title: 'Thất bại!',
+    text: 'Bạn chưa tạo key nên không thể thực hiện report key được!',
+    icon: 'warning',
+    confirmButtonText: 'OK'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Chuyển hướng sau khi người dùng nhấn "OK"
+      window.location.href = `${pageContext.request.contextPath}/page/user/general-key-info`;
+    }
+  });
+  <%
+  }
+  %>
 </script>
-
 
 </body>
 </html>

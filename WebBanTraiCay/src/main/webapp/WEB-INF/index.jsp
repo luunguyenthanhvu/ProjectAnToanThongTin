@@ -411,6 +411,7 @@
     </svg>
 </div>
 <script> var context = "${pageContext.request.contextPath}";
+      var websocket = "localhost:8080";
 document.addEventListener('DOMContentLoaded', (event) => {
   initializeWebSocket();
 });
@@ -432,7 +433,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 <script src="${pageContext.request.contextPath}/static/js/google-map.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.2/cloudinary-core-shrinkwrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/main.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=8"></script>
+<script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js?v=2"></script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/load-image.js?v=3"
         charset="UTF-8"></script>
 </body>
