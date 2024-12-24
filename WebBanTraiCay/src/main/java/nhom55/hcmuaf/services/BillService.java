@@ -201,9 +201,12 @@ public class BillService extends AbsDAO {
     }
   }
 
+  public void updateStatusBill(int idBill, String status) {
+    billDao.updateStatusABill(idBill, status);
+  }
+
   private void updateBillWrongSignature(Bills bills) {
     // if signature wrong send email + update status
-    BillDao billDao = new BillDaoImpl();
     billDao.updateStatusABill(bills.getId(), "Đã hủy");
 
     Properties properties = MailProperties.getSMTPPro();

@@ -237,7 +237,7 @@ public class BillDaoImpl implements BillDao {
   @Override
   public void updateStatusABill(int idBill, String status) {
     JDBIConnector.get().withHandle(h -> {
-      return h.createUpdate("update bills set status = :status where id = :idBill")
+      return h.createUpdate("UPDATE bills set status = :status where id = :idBill")
           .bind("status", status)
           .bind("idBill", idBill)
           .execute();
