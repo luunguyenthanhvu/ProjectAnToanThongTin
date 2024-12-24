@@ -12,7 +12,7 @@ public class KeyReportDaoImpl implements KeyReportDao {
       System.out.println("bắt đầu report");
       JDBIConnector.get().useHandle(handle ->
           handle.createUpdate(
-                  "INSERT INTO key_report (public_key_id, start_date, end_date, reason) VALUES (:publicKeyId, :startDate, :endDate, :reason)")
+                  "INSERT INTO key_reported (publicKeyId, startDate, endDate, reason) VALUES (:publicKeyId, :startDate, :endDate, :reason)")
               .bind("publicKeyId", keyReport.getPublicKeyId())
               .bind("startDate", keyReport.getStartDate())
               .bind("endDate", keyReport.getEndDate())
@@ -28,8 +28,8 @@ public class KeyReportDaoImpl implements KeyReportDao {
   @Override
   public KeyReport getKeyReportByPublicKeyId(int id) {
     return JDBIConnector.get().withHandle(handle ->
-        handle.createQuery("SELECT id, public_key_id AS publicKeyId, start_date AS startDate, " +
-                "end_date AS endDate, reason FROM key_report WHERE public_key_id = :publicKeyId")
+        handle.createQuery("SELECT id, publicKeyId AS publicKeyId, startDate AS startDate, " +
+                "endDate AS endDate, reason FROM key_reported WHERE publicKeyId = :publicKeyId")
             .bind("publicKeyId", id)
             .mapToBean(KeyReport.class)
             .findOne()

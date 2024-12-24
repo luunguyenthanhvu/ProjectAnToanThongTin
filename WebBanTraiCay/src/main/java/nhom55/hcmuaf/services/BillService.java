@@ -93,57 +93,47 @@ public class BillService extends AbsDAO {
     UserPublicKeyDAOImpl userPublicKeyDAO = new UserPublicKeyDAOImpl();
     KeyReportDao keyReportDao = new KeyReportDaoImpl();
 
-    // get user public key
-    UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(bill.getUserId());
-    PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
-
-    // check if public key was report?
-    KeyReport keyReport = keyReportDao.getKeyReportByPublicKeyId(publicKey.getId());
-    if (keyReport != null) {
-      LocalDateTime startDate = keyReport.getStartDate();
-      LocalDateTime endDate = keyReport.getEndDate();
-      LocalDateTime orderedDate = bill.getOrderedDate();
-
-      // Kiểm tra xem orderedDate có nằm trong khoảng startDate và endDate không
-      if ((orderedDate.isEqual(startDate) || orderedDate.isAfter(startDate)) &&
-          (orderedDate.isEqual(endDate) || orderedDate.isBefore(endDate))) {
-        System.out.println("Ordered date is within the reported range.");
-        throw new MyHandleException("This bill is not valid", 500);
-      }
-    }
-
-    System.out.println("Public key: " + publicKey);
-
-    // Generate the hash of the bill JSON
-    String billJson = MyUtils.convertBillsJson(bill);
-    System.out.println("Bill JSON: " + billJson);
-    String hashBill = hash.hashText(billJson);
-    System.out.println("Hash after first hashing: " + hashBill);
-    String hash2 = hash.hashText(hashBill);
-    System.out.println("Hash after second hashing: " + hash2);
-
-    // Initialize DigitalSignature object and attempt to verify the signature
-    DigitalSignature digitalSignature = new DigitalSignatureImpl();
-    digitalSignature.loadPublicKey(publicKey.getKey());
-    System.out.println("Public key being used for verification: " + publicKey.getKey());
-
     // Declare variable for decrypted signature hash
     String decryptedSignatureHash = null;
+    // Generate the hash of the bill JSON
+    String billJson = MyUtils.convertBillsJson(bill);
+    String hashBill = hash.hashText(billJson);
+    String hash2 = hash.hashText(hashBill);
+    // Initialize DigitalSignature object and attempt to verify the signature
+    DigitalSignature digitalSignature = new DigitalSignatureImpl();
 
     try {
+      // get user public key
+      UserPublicKey userPublicKey = userPublicKeyDAO.getUserPublicKey(bill.getUserId());
+      PublicKey publicKey = userPublicKeyDAO.getPublicKey(userPublicKey.getIdPublicKey());
+
+      digitalSignature.loadPublicKey(publicKey.getKey());
       // Try to get the decrypted signature hash with the current public key
       decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
-      System.out.println("Decrypted hash from signature: " + decryptedSignatureHash);
-
-      // If hashes match, verification is successful
+      // If hashes match, check if it has been reported
       if (hash2.equals(decryptedSignatureHash)) {
+        // check if public key was report?
+        KeyReport keyReport = keyReportDao.getKeyReportByPublicKeyId(publicKey.getId());
+        if (keyReport != null) {
+          LocalDateTime startDate = keyReport.getStartDate();
+          LocalDateTime endDate = keyReport.getEndDate();
+          LocalDateTime orderedDate = bill.getOrderedDate();
+
+          // Kiểm tra xem orderedDate có nằm trong khoảng startDate và endDate không
+          if ((orderedDate.isEqual(startDate) || orderedDate.isAfter(startDate)) &&
+              (orderedDate.isEqual(endDate) || orderedDate.isBefore(endDate))) {
+            System.out.println("Ordered date is within the reported range.");
+            updateBillWrongSignature(bill);
+            throw new MyHandleException("This bill is not valid", 500);
+          }
+        }
         return MessageResponseDTO.builder().message("Verify Success!").build();
       } else {
         updateBillWrongSignature(bill);
         throw new MyHandleException("Signature mismatch with the current public key", 500);
       }
-    } catch (BadPaddingException e) {
-      // If there's a BadPaddingException (signature doesn't match), try using the previous public key
+    } catch (BadPaddingException | NullPointerException e) {
+      // If there's a BadPaddingException or null pointer (signature doesn't match), try using the previous public key
       System.out.println("BadPaddingException caught: Trying with the previous public key");
 
       // Attempt to get the previous public key before the bill creation time
@@ -151,25 +141,27 @@ public class BillService extends AbsDAO {
         PublicKey publicKeyBefore = publicKeyDAO.getLatestPublicKeyBefore(bill.getUserId(),
             bill.getCreationTime());
 
-        // check if public key was report?
-        KeyReport keyReport2 = keyReportDao.getKeyReportByPublicKeyId(publicKey.getId());
-        if (keyReport2 != null) {
-          LocalDateTime startDate = keyReport2.getStartDate();
-          LocalDateTime endDate = keyReport2.getEndDate();
-          LocalDateTime orderedDate = bill.getOrderedDate();
-
-          // Kiểm tra xem orderedDate có nằm trong khoảng startDate và endDate không
-          if ((orderedDate.isEqual(startDate) || orderedDate.isAfter(startDate)) &&
-              (orderedDate.isEqual(endDate) || orderedDate.isBefore(endDate))) {
-            System.out.println("Ordered date is within the reported range.");
-            throw new MyHandleException("This bill is not valid", 500);
-          }
-        }
         digitalSignature.loadPublicKey(publicKeyBefore.getKey());
         decryptedSignatureHash = digitalSignature.getHashFromSignature(bill.getSignature());
 
         // If the decrypted signature matches with the previous public key, verify successfully
         if (hash2.equals(decryptedSignatureHash)) {
+          // check if public key was report?
+          KeyReport keyReport2 = keyReportDao.getKeyReportByPublicKeyId(publicKeyBefore.getId());
+          System.out.println("key report 2 nè" + keyReport2);
+          if (keyReport2 != null) {
+            LocalDateTime startDate = keyReport2.getStartDate();
+            LocalDateTime endDate = keyReport2.getEndDate();
+            LocalDateTime orderedDate = bill.getOrderedDate();
+
+            // Kiểm tra xem orderedDate có nằm trong khoảng startDate và endDate không
+            if ((orderedDate.isEqual(startDate) || orderedDate.isAfter(startDate)) &&
+                (orderedDate.isEqual(endDate) || orderedDate.isBefore(endDate))) {
+              System.out.println("Ordered date is within the reported range.");
+              updateBillWrongSignature(bill);
+              throw new MyHandleException("This bill is not valid", 500);
+            }
+          }
           return MessageResponseDTO.builder().message("Verify Success!")
               .build();
         } else {

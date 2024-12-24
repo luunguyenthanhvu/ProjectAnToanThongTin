@@ -7,14 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import nhom55.hcmuaf.log.Log;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class KeyReport extends Log<PublicKey> {
+public class KeyReport {
 
   int id;
   int publicKeyId;
