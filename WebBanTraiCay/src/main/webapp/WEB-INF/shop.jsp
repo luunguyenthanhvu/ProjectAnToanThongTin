@@ -410,9 +410,8 @@
 
 <script> var context = "${pageContext.request.contextPath}";
 var seachText = "${requestScope.productName}";
-var websocket = "localhost:8080";
 var category = "${requestScope.category}";
-var websocket = "localhost:8080";
+var websocket = "localhost:8443";
 document.addEventListener('DOMContentLoaded', (event) => {
     initializeWebSocket();
 });

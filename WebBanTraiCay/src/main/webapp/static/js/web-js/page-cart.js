@@ -68,7 +68,7 @@ function initializeWebSocket() {
     console.log('WebSocket connection already established.');
     return;
   }
-  socket = new WebSocket(`ws://${window.websocket}/websocket/cart-socket`);
+  socket = new WebSocket(`wss://${window.websocket}/websocket/cart-socket`);
 
   socket.onopen = () => {
     console.log('WebSocket connected');

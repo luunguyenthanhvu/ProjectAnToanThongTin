@@ -515,7 +515,7 @@
 
 </script>
 <script> var context = "${pageContext.request.contextPath}";
-var websocket = "localhost:8080";
+var websocket = "localhost:8443";
 </script>
 <script src="${pageContext.request.contextPath}/static/js/web-js/index-page.js"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>

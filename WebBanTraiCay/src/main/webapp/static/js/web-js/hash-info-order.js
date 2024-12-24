@@ -31,7 +31,7 @@ async function hashInfoOrder() {
         .then((data) => {
             console.log('JSON data:', data);
             if (data.invalidInfo === "true") {
-                alert("Thông tin không hợp lệ!");
+                alert("Thong tin khong hop le!");
             } else {
                 console.log('Hash info order:', data.data);
                 document.getElementById("info_hash_for_user").value = data.data;

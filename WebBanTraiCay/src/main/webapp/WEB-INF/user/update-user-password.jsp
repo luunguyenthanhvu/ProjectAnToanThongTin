@@ -270,7 +270,7 @@
     </svg>
 </div>
 <script> var context = "${pageContext.request.contextPath}";
-var websocket = "localhost:8080";
+var websocket = "localhost:8443";
 </script>
 <script>
   // validate for input

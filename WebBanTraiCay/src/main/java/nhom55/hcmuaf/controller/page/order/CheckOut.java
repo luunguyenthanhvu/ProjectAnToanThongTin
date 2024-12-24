@@ -107,6 +107,7 @@ public class CheckOut extends HttpServlet {
         }
         int idPayment = 1;
         address += ", quận " + district + ", tỉnh " + city;
+        System.out.println("Địa chỉ mới: " + address);
         //Tạo object order JSON
 //        JSONObject jsonObject = new JSONObject();
 //        jsonObject.put("lastName", lastName);

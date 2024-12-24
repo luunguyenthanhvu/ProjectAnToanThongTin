@@ -851,7 +851,7 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script> var context = "${pageContext.request.contextPath}";
-var websocket = "localhost:8080";
+var websocket = "localhost:8443";
 </script>
 <%--Js xử lý lấy dữ liệu vận chuyển--%>
 <script src="${pageContext.request.contextPath}/static/js/web-js/process-delivery-fee.js?v=12"></script>

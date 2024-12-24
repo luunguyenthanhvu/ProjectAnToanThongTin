@@ -278,7 +278,7 @@
     </svg>
 </div>
 <script> var context = "${pageContext.request.contextPath}";
-var websocket = "localhost:8080";
+var websocket = "localhost:8443";
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/static/js/jquery.min.js"></script>

@@ -1,9 +1,9 @@
 async function createNewAPairKey() {
   const {value: password} = await Swal.fire({
-    title: "Xác minh người dùng",
+    title: "Xac minh nguoi dung",
     input: "password",
-    inputLabel: "Vui lòng nhập mật khẩu để xác minh danh tính",
-    inputPlaceholder: "Nhập mật khẩu",
+    inputLabel: "Vui long nhap mat khau de xac minh danh tinh",
+    inputPlaceholder: "Nhap mat khau",
     showCancelButton: true,
     inputAttributes: {
       autocapitalize: "off",
@@ -17,8 +17,8 @@ async function createNewAPairKey() {
     if (result.status === "fail") {
       Swal.fire({
         icon: "error",
-        title: "Xác minh thất bại",
-        text: "Mật khẩu không đúng. Vui lòng nhập lại"
+        title: "Xac minh that bai",
+        text: "Mat khau khong dung. Vui long nhap lai"
       });
     } else {
       window.location.href = `${window.context}/page/user/create-a-key-pair-for-user`;
@@ -28,10 +28,10 @@ async function createNewAPairKey() {
 
 async function reportAPairKey() {
   const {value: password} = await Swal.fire({
-    title: "Xác minh người dùng",
+    title: "Xac minh nguoi dung",
     input: "password",
-    inputLabel: "Vui lòng nhập mật khẩu để xác minh danh tính",
-    inputPlaceholder: "Nhập mật khẩu",
+    inputLabel: "Vui long nhap mat khau de xac minh danh tinh",
+    inputPlaceholder: "Nhap mat khau",
     showCancelButton: true,
     inputAttributes: {
       maxlength: "10",
@@ -45,14 +45,14 @@ async function reportAPairKey() {
     if (result.status === "fail") {
       Swal.fire({
         icon: "error",
-        title: "Xác minh thất bại",
-        text: "Mật khẩu không đúng. Vui lòng nhập lại"
+        title: "Xac minh that bai",
+        text: "Mat khau khong dung. Vui long nhap lai"
       });
     } else if (result.status === "inValidKey") {
       Swal.fire({
         icon: "error",
-        title: "Không có key",
-        text: "Bạn không có key để report."
+        title: "Khong co key",
+        text: "Ban khong co key de report."
       });
     } else {
       window.location.href = `${window.context}/page/user/report-a-key-pair-of-user`;
